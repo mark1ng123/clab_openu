@@ -1,0 +1,14 @@
+Please give your number: 
+Please give your rotation: 
+
+Decimal representation for entered number is : 115
+Hexadecimal representation for entered number is : 73
+Octal decimal representation for entered number is:  163
+binary representation for entered number is: 
+00000000000000000000000001110011
+
+binary representation for rotated number is: 
+00000000111001100000000000000000
+Decimal representation for rotated number is : 15073280
+Hexadecimal representation for rotated number is : e60000
+Octal decimal representation for rotated number is:  71400000

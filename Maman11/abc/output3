@@ -1,0 +1,6 @@
+Welcome to the abc program
+Enter a string containing only the 'abc' alphabet: received input string: 
+abc     abc     abcdef      abcdef      aaaaa AAAAA abc   xyz  123
+
+Input is good, running algorithm...
+After algo: a-c     a-c     a-f      a-f      aaaaa AAAAA a-c   x-z  123

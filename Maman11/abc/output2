@@ -1,0 +1,6 @@
+Welcome to the abc program
+Enter a string containing only the 'abc' alphabet: received input string: 
+zxcvabcdefABCDEFabc123asdk
+
+Input is good, running algorithm...
+After algo: zxcva-fA-Fa-c123asdk
