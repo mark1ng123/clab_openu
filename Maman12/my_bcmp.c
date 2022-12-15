@@ -50,11 +50,7 @@ int main(){
         printf("Length is not valid\n");
         return -1;
     }
-    /*Entering length of size 0 always return equal as asked*/
-    else if(len_converted == 0){
-        printf("Substrings of length 0 are always equal\n");
-        return 0;
-    }
+
 
     printf("Enter your first index in range [1-512]\n");
     fgets(first_index, MAX_LENGTH, stdin);
@@ -81,6 +77,12 @@ int main(){
     else if(compare_via_index(first_index_converted, second_index_converted, strlen(input_string), len_converted) == -1){
         printf(",The compared sub strings are not the same\n");
         return -1;
+    }
+
+    /*Entering length of size 0 always return equal as asked*/
+    if(len_converted == 0){
+        printf("Substrings of length 0 are always equal\n");
+        return 0;
     }
 
     create_substring(first_substring, input_string, first_index_converted-INDEX_OFFSET,len_converted);
