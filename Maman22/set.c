@@ -25,13 +25,12 @@ set* create_set() {
     if (s == NULL){
         return NULL;
     }
+    s->bit_map[0] = '\0';
     return s;
 }
 
 void read_set(set *s, int *number, int length){
     int idx = 0;
-    printf("reading\n");
-    printf("idx:%d, length:%d, number:%d", idx, length, number[idx]);
     for(; idx<length && *number!=-1; idx++){
         printf("idx: %d\n", idx);
         set_bit_map(s, *number);
