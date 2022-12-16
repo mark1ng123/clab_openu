@@ -32,9 +32,42 @@ set* create_set() {
 void read_set(set *s, int *number, int length){
     int idx = 0;
     for(; idx<length && *number!=-1; idx++){
-        printf("idx: %d\n", idx);
         set_bit_map(s, *number);
         ++number;
+    }
+}
+
+void union_set(set* first_set, set* second_set, set* united_set){
+    int idx = 0;
+    for(; idx<NUMBER_RANGE; idx++){
+        if((get_bit_from_index(first_set, idx) || get_bit_from_index(second_set,idx))){
+            set_bit_map(united_set, idx);
+        }
+    }
+}
+
+void intersect_set(set* first_set, set* second_set, set* united_set){
+    int idx = 0;
+    for(; idx<NUMBER_RANGE; idx++){
+        if((get_bit_from_index(first_set, idx) && get_bit_from_index(second_set,idx))){
+            set_bit_map(united_set, idx);
+        }
+    }
+}
+
+void symdiff_set(set* first_set, set* second_set, set* united_set){
+    set *united = create_set();
+    set *intersected = create_set();
+    union_set(first_set, second_set, united);
+    intersect_set(first_set, second_set, intersected);
+    sub_set(united, intersected, united_set);
+}
+void sub_set(set* first_set, set* second_set, set* united_set){
+    int idx = 0;
+    for(; idx<NUMBER_RANGE; idx++){
+        if((get_bit_from_index(first_set, idx) && !get_bit_from_index(second_set,idx))){
+            set_bit_map(united_set, idx);
+        }
     }
 }
 

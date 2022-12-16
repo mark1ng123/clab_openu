@@ -8,7 +8,7 @@
 #define MAX_LENGTH 512
 #define NUMBER_OF_SETS 6
 
-const char *valid_operations[] = {"read_set", "print_set"};
+const char *valid_operations[] = {"read_set", "print_set", "union_set", "intersect_set", "sub_set", "symdiff_set", "stop"};
 const char *set_names[]={"SETA", "SETB", "SETC", "SETD", "SETE", "SETF"};
 set* sets[NUMBER_OF_SETS];
 
@@ -54,7 +54,7 @@ int check_set_name(char *user_input){
 
 int check_command(char *user_input){
     int operation_idx = 0;
-    for(; operation_idx < 2; operation_idx++){
+    for(; operation_idx < 7; operation_idx++){
         if(memcmp(user_input, valid_operations[operation_idx], strlen(valid_operations[operation_idx])) == 0){
             return operation_idx;
         }
@@ -177,6 +177,27 @@ int main(){
                     printf("Entered a wrong set name\n");
                 }
             }
+        }else if(operation_idx == 2 || operation_idx == 3 || operation_idx == 4 || operation_idx == 5){
+
+            if(operation_idx == 2){
+                printf("union_set\n");
+                union_set(sets[0], sets[1], sets[2]);
+            }else if(operation_idx == 3){
+                printf("intersect_set\n");
+                intersect_set(sets[0], sets[1], sets[2]);
+            }
+            else if(operation_idx == 4){
+                printf("sub_set");
+                sub_set(sets[0], sets[1], sets[2]);
+            }
+            else{
+                printf("symdiff_set\n");
+                symdiff_set(sets[0], sets[1], sets[2]);
+            }
+        }
+        else if(operation_idx == 6){
+            printf("stopping \n");
+            break;
         }
     }else {
             printf("You entered a wrong command\n");

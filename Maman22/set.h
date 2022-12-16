@@ -9,5 +9,9 @@ void read_set(set *s, int *number, int length);
 void print_set(set *s);
 int get_bit_from_index(set* s, int index);
 set* create_set();
+void union_set(set* first_set, set* second_set, set* united_set);
+void intersect_set(set* first_set, set* second_set, set* united_set);
+void sub_set(set* first_set, set* second_set, set* united_set);
+void symdiff_set(set* first_set, set* second_set, set* united_set);
 
 #endif
