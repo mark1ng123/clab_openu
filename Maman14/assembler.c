@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "check_input_files.h"
 #include "pre_assembler.h"
+#include "first_parse.h"
 
 /* TODO: Add doc when finished each step.*/
 /*
@@ -52,6 +53,10 @@ int main(int argc, char **argv){
         /* step one: pre-assembler stage: */
         printf("Opened the file successfully, continuing to the pre-assembler stage\n\n\n");
         if(pre_assemble(current_file, file_name)==-1){
+            return -1;
+        }
+
+        if(first_parse(file_name) == -1){
             return -1;
         }
         /* TODO: add next stages when done */
