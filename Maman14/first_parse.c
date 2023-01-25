@@ -473,7 +473,6 @@ int first_parse(char* file_name) {
                                 decimal_adress += word_counter;
                                 word_counter = 0;
                                 break;
-                            break;
                         /* .string */
                         case 1:
                             printf("data_instraction: %s\n", word_parse);
@@ -727,13 +726,15 @@ int is_valid_string (char * string, int line) {
 
     for (char_string = *temp_string; char_string != '\0'; char_string = *++temp_string) {
         printf("this is char t: %c\n",char_string);
-        if ((char_string == ' ') && (is_first_quote == 0) ){
+        if ((char_string == ' ') && (is_first_quote == 0)){
             continue;
         }
         else if (is_first_quote == 1 && is_last_quote == 1 && char_string!= ' '){
+            error_def = "Invalid syntax";
+            register_new_error(line, error_def);
             return -1;
         }
-        else if (is_first_quote == 0 && is_last_quote == 0 && char_string!= ' ' && char_string!= '"'){
+        else if (is_first_quote == 0 && is_last_quote == 0 && char_string!= '"'){
             error_def = "Invalid syntax";
             register_new_error(line, error_def);
             return -1;
@@ -741,7 +742,7 @@ int is_valid_string (char * string, int line) {
         else if(char_string == '"' && is_first_quote == 0){
             is_first_quote = 1;
         }
-        else if (char_string == '"' && is_first_quote == 1){
+        else if (char_string == '"'){
             is_last_quote = 1;
         }
     }
