@@ -646,13 +646,12 @@ int is_valid_data_instruct(char * string, int line){
 
     for (number = *temp_string; number != '\0'; number = *++temp_string) {
         /* Catching invalid symbols */
-        if(number != '-' && number != ',' && (number > '9' || number <'0')){
+        if(number != '-' && number != ',' && number != '+' && (number > '9' || number <'0')){
             error_def = "Invalid syntax";
             register_new_error(line, error_def);
             return -1;
         }
-
-        if(number == '-'){
+        if(number == '-' || number == '+'){
             is_symbol ++;
             if(is_symbol == 1){
                 number_symbol = number;
