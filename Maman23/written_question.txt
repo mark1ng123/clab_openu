@@ -1,0 +1,12 @@
+1. The arguemnt given is always wrong, 
+The standard input stdin is not always given from the keyboard, The standard output stdoutis not always the terminal or the screen, And the standard error stderr is not always the screen or the terminal. 
+We can redirect using the operator '>' for the output and '<' for the input.
+When using those operator we can receive input from files and output it to a file, another fact if we use 1> and 2> the 1 represents the stdout and the 2 represents the stderr.
+
+
+2. The argument given is always wrong, 
+We cannot declare static register variable, it has to many storage classes.
+
+
+
+

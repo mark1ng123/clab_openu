@@ -48,6 +48,8 @@ int check_if_word_is_register(char *optional_op);
 
 int is_skip_line(char *potential_symbol_name);
 
+int is_valid_data_instruct(char * string, int line);
+
 int is_valid_string (char *s, int line);
 
 int calc_ascii_in_string (char char_string);
@@ -59,5 +61,7 @@ void register_new_error(int line_number, char* error_definition);
 void insert_new_symbol(int line, char *symbol_name, struct Symbol *head, struct Symbol *symbol,  struct Symbol *tail);
 
 void test_print_error();
+
+int string_to_number_conv(char *string);
 #endif
 

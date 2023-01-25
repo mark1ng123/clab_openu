@@ -20,7 +20,7 @@ int is_symbol_error = 0;
 /*TODO:
  * 1.   .ent, .ext
  * 2.   Calculate binary address values...
- * 3.   Left Exception: data instruct params, invalid chars
+ * 3.   Left Exception: invalid chars in operation codes
  */
 
 int first_parse(char* file_name) {
@@ -251,10 +251,17 @@ int first_parse(char* file_name) {
                         switch(data_instruction_code){
                             /* .data */
                             case 0:
-                                word_parse = strtok(NULL, ", ");
-                                while(word_parse!=NULL){
-                                    word_counter ++;
-                                    word_parse = strtok(NULL, ", \n");
+                                printf("data_instraction: %s\n", word_parse);
+                                word_parse = strtok(NULL, "\n");
+                                printf("current_word: %s\n", word_parse);
+                                if(is_valid_data_instruct(word_parse, line_counter) == 0){
+                                word_parse = strtok(word_parse, ", \n");
+                                    while(word_parse != NULL){
+                                        printf("Word: %s\n", word_parse);
+                                        printf("ascii: %d\n", (string_to_number_conv(word_parse)));
+                                        word_parse = strtok(NULL, ", \n");
+                                        word_counter ++;
+                                    }
                                 }
                                 decimal_adress += word_counter;
                                 word_counter = 0;
@@ -451,13 +458,21 @@ int first_parse(char* file_name) {
                     switch(data_instruction_code){
                         /* .data */
                         case 0:
-                            word_parse = strtok(NULL, ", ");
-                            while(word_parse!=NULL){
-                                word_counter ++;
-                                word_parse = strtok(NULL, ", \n");
-                            }
-                            decimal_adress += word_counter;
-                            word_counter = 0;
+                            printf("data_instraction: %s\n", word_parse);
+                                word_parse = strtok(NULL, "\n");
+                                printf("current_word: %s\n", word_parse);
+                                if(is_valid_data_instruct(word_parse, line_counter) == 0){
+                                word_parse = strtok(word_parse, ", \n");
+                                    while(word_parse != NULL){
+                                        printf("Word: %s\n", word_parse);
+                                        printf("ascii: %d\n", (string_to_number_conv(word_parse)));
+                                        word_parse = strtok(NULL, ", \n");
+                                        word_counter ++;
+                                    }
+                                }
+                                decimal_adress += word_counter;
+                                word_counter = 0;
+                                break;
                             break;
                         /* .string */
                         case 1:
@@ -601,6 +616,97 @@ int is_skip_line(char *potential_symbol_name) {
     return -1;
 }
 
+
+int string_to_number_conv(char *string){
+    printf("str len: %lu\n", strlen(string));
+    return '0' + atoi(string);
+}
+
+
+int is_valid_data_instruct(char * string, int line){
+    char * temp_string;
+    char *error_def;
+    int is_comma = 0;
+    int digits = 0;
+    int is_symbol = 0;
+    char number;
+    char number_symbol;
+    char *full_number;
+    char *prev_full_number;
+
+    /* Catching null string */
+    if(string == NULL){
+        error_def = "Invalid syntax";
+        register_new_error(line, error_def);
+        return -1;
+    }
+    prev_full_number = malloc(strlen(string)+1);
+    full_number = malloc(strlen(string)+1);
+    temp_string = malloc(strlen(string)+1);
+    strcpy(temp_string,string);
+
+    for (number = *temp_string; number != '\0'; number = *++temp_string) {
+        /* Catching invalid symbols */
+        if(number != '-' && number != ',' && (number > '9' || number <'0')){
+            error_def = "Invalid syntax";
+            register_new_error(line, error_def);
+            return -1;
+        }
+
+        if(number == '-'){
+            is_symbol ++;
+            if(is_symbol == 1){
+                number_symbol = number;
+                full_number[digits] = number_symbol;
+                digits++;
+            }else{
+                error_def = "Invalid syntax";
+                register_new_error(line, error_def);
+                return -1;
+            }
+
+        }
+        else if(number == ','){
+            /* Catching comma with no numbers in the end */
+            if(*(temp_string+1) == '\0'){
+                error_def = "Invalid syntax";
+                register_new_error(line, error_def);
+                return -1;
+            }
+            is_comma++;
+            if(is_comma == 1){
+                if(full_number[0] == '\0' || strcmp(prev_full_number, full_number) == 0){
+                    error_def = "Invalid syntax";
+                    register_new_error(line, error_def);
+                    return -1;
+                }
+                printf("full number: %s\n", full_number);
+                digits = 0;
+            }else if(is_comma == 2 && digits != 0 && is_symbol == 0){
+                printf("full number: %s\n", full_number);
+                digits = 0;
+                is_comma = 0;
+                strcpy(prev_full_number, full_number);
+            }
+            else{
+                error_def = "Invalid syntax";
+                register_new_error(line, error_def);
+                return -1;
+            }
+            continue;
+        }
+        else{
+                full_number[digits] = number;
+                digits++;
+                is_symbol = 0;
+            }
+        }
+    printf("full number: %s\n", full_number);
+    free(prev_full_number);
+    free(full_number);
+    return 0;
+}
+
 int is_valid_string (char * string, int line) {
     char * temp_string;
     char *error_def;
@@ -617,6 +723,7 @@ int is_valid_string (char * string, int line) {
 
     temp_string = malloc(strlen(string)+1);
     strcpy(temp_string,string);
+
 
     for (char_string = *temp_string; char_string != '\0'; char_string = *++temp_string) {
         printf("this is char t: %c\n",char_string);
@@ -691,7 +798,7 @@ void insert_new_symbol(int line, char *symbol_name, struct Symbol *head, struct 
         }
         tail->next = symbol;
     }else if(re_occuring_symbol_name(head, symbol_name) == NULL){
-        error_def = "Reoccuring symbol name";
+        error_def = "Reoccurring symbol name";
         register_new_error(line, error_def);
     }
 }

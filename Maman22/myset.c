@@ -288,6 +288,7 @@ int main() {
                                             user_input_pointer += SET_NAME_LENGTH;
                                             /* 3rd name check */
                                             if (name_check != -1) {
+                                                sets[name_check] = create_set();
                                                 user_third_input_set = sets[name_check];
                                                 while (isspace(*user_input_pointer)) {
                                                     ++user_input_pointer;

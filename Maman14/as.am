@@ -7,6 +7,6 @@ bne LOOP(r4,r3)
 L1:      inc K
 bne LOOP(K,STR)
 END:     stop
-STR:    .string
+STR:    .string "abcdef"
 LENGTH: .data 6,-9,15
 K:      .data 22
