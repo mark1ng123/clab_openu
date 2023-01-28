@@ -45,7 +45,7 @@ int first_parse(char* file_name) {
 
 
     /* Errors: */
-    char* error_def;
+    char* error_def = NULL;
     /* Symbol declarations */
     char *potential_symbol_name;
     int decimal_adress = BASE_DECIMAL_ADD;
@@ -135,37 +135,33 @@ int first_parse(char* file_name) {
                             case 6:
                                 printf("operation: %s\n", word_parse);
                                 word_counter++;
-                                word_parse = strtok(NULL, ", ");
-                                while(word_parse!=NULL){
+                                word_parse = strtok(NULL, "\n");
+                                printf("word_parse: %s\n", word_parse);
+                                if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
+                                    printf("OK");
+                                    word_parse = strtok(word_parse, "\n, ");
+                                    while(word_parse!=NULL){
                                     if(check_if_word_is_register(word_parse) != -1){
                                         word_is_register++;
                                     }
-
                                     else {
                                         word_counter++;
                                     }
                                     printf("\n word_parse is: %s \n" , word_parse);
                                     word_parse = strtok(NULL, "\n, ");
                                 }
-
-                                number_of_parameters = word_counter + word_is_register;
-                                if(number_of_parameters != 3){
-                                    /* register the error */
-                                    error_def = "Invalid number of params";
-                                    register_new_error(line_counter, error_def);
-                                }else{
-                                    if(word_is_register == 2){
-                                        decimal_adress += word_counter;
-                                        decimal_adress ++;
-                                    }
-                                    else{
-                                        decimal_adress += word_counter;
-                                        decimal_adress += word_is_register;
-                                    }
+                                if(word_is_register == 2){
+                                    decimal_adress += word_counter;
+                                    decimal_adress ++;
+                                }
+                                else{
+                                    decimal_adress += word_counter;
+                                    decimal_adress += word_is_register;
                                 }
                                 word_is_register = 0;
                                 word_counter = 0;
-                                break;
+                            }
+                            break;
                             /* not, clr, inc, dec, red, prn */
                             case 4:
                             case 5:
@@ -622,8 +618,74 @@ int string_to_number_conv(char *string){
 }
 
 
+int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_code){
+    char *temp_string;
+    char *error_def;
+    char current_char;
+    char *full_operand;
+
+    int is_comma;
+    int is_open;
+    int char_num = 0;
+    /* Catching the minimum operands for each op code */
+    if ((op_code >= 0 && op_code <= 13 && operand_phrase == NULL ) || (op_code > 13 && operand_phrase != NULL)){
+        error_def = "Invalid syntax";
+        register_new_error(line_counter, error_def);
+        return -1;
+    }
+
+    temp_string = malloc(strlen(operand_phrase) + 1);
+    full_operand = malloc(strlen(operand_phrase) + 1);
+    strcpy(temp_string, operand_phrase);
+
+    for (current_char = *temp_string; current_char != '\0'; current_char = *++temp_string) {
+        printf("current_char %c\n", current_char);
+        /* Not Valid chars */
+        if(current_char != '-' && current_char != ',' && current_char != '+' && current_char != ')' && current_char != '('
+        && (current_char > '9' || current_char <'0') && (isalpha(current_char) == 0)){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
+        else if(((op_code >=0 && op_code <=3) || op_code == 6 ) && (current_char == '(' || current_char == ')')){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
+        if(current_char == ','){
+            if(*(temp_string+1) == '\0'){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
+            is_comma++;
+            char_num++;
+            full_operand[char_num] = '\0';
+            printf("full operand : %s\n", full_operand);
+            char_num = 0;
+        }else if(current_char == '('){
+            if(*(temp_string+1) == '\0'){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
+            is_open++;
+        }else if(current_char == ')' && is_open == 1){
+            is_open--;
+            char_num = 0;
+        }else{
+            printf("char num %d, current char %c \n", char_num, current_char);
+            full_operand[char_num] = current_char;
+            char_num++;
+        }
+    }
+    full_operand[char_num] = '\0';
+    printf("full operand : %s\n", full_operand);
+    return 0;
+}
+
 int is_valid_data_instruct(char * string, int line){
-    char * temp_string;
+    char *temp_string;
     char *error_def;
     int is_comma = 0;
     int digits = 0;
@@ -767,6 +829,7 @@ void register_new_error(int line_number, char* error_definition){
     if (errors_head == NULL) {
         errors_head = error;
         errors_tail = error;
+        errors_head->next = NULL;
     } else {
         errors_tail->next = error;
         errors_tail = error;
@@ -808,5 +871,6 @@ void test_print_error(){
         printf("Error: %s in line: %d\n", errors_head->error_defenition, errors_head->line_number);
         free(errors_head->error_defenition);
         errors_head = errors_head->next;
-    }
+        }
+
 }

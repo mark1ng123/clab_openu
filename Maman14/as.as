@@ -1,5 +1,5 @@
-mov asd,r4
-jmp L1(#-1,r6)
+MAIN:   mov asd,r4
+LOOP:   jmp L1(#-1,r6)
 mcr m1
     sub  r1, r4
     bne  END

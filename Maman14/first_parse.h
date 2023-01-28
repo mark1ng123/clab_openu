@@ -62,6 +62,8 @@ void insert_new_symbol(int line, char *symbol_name, struct Symbol *head, struct 
 
 void test_print_error();
 
+int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_code);
+
 int string_to_number_conv(char *string);
 #endif
 
