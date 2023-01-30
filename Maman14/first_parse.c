@@ -210,22 +210,25 @@ int first_parse(char* file_name) {
                             case 10:
                             case 13:
                                 printf("operation: %s\n", word_parse);
-                                word_counter ++;
-                                word_parse = strtok(NULL, "(, ");
-                                while(word_parse!=NULL){
-                                    if(check_if_word_is_register(word_parse) != -1){
-                                        word_is_register++;
+                                word_counter++;
+                                word_parse = strtok(NULL, "\n");
+                                printf("test: %s\n", word_parse);
+                                if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
+                                    printf("OK\n");
+                                    word_parse = strtok(word_parse, "(, ");
+                                    while(word_parse != NULL){
+                                        if(check_if_word_is_register(word_parse) != -1){
+                                            word_is_register++;
+                                        }
+                                        else {
+                                            word_counter++;
+                                        }
+                                        word_parse = strtok(NULL, ",) \n");
                                     }
-                                    else {
-                                        word_counter++;
+                                    if(word_is_register + word_counter != 4){
+                                        error_def = "Invalid number of params";
+                                        register_new_error(line_counter, error_def);
                                     }
-                                    word_parse = strtok(NULL, ",) \n");
-                                }
-                                number_of_parameters = word_counter + word_is_register;
-                                if(number_of_parameters != 2 && number_of_parameters != 4){
-                                    error_def = "Invalid number of params";
-                                    register_new_error(line_counter, error_def);
-                                }else{
                                     if(word_is_register == 2){
                                         decimal_adress += word_counter;
                                         decimal_adress ++;
@@ -234,9 +237,9 @@ int first_parse(char* file_name) {
                                         decimal_adress += word_counter;
                                         decimal_adress += word_is_register;
                                     }
+                                    word_is_register = 0;
+                                    word_counter = 0;
                                 }
-                                word_is_register = 0;
-                                word_counter = 0;
                                 break;
                             /* rts, stop */
                             case 14:
@@ -637,9 +640,11 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
     char *error_def;
     char current_char;
     char *full_operand;
+
     int temp_number_of_chars = 0;
     int is_comma = 0;
     int is_open = 0;
+    int is_close = 0;
     int is_symbol = 0;
     int char_num = 0;
     int is_digit = 0;
@@ -666,7 +671,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 register_new_error(line_counter, error_def);
                 return -1;
             }
-        else if(((op_code >=0 && op_code <=3) || op_code == 6 ) && (current_char == '(' || current_char == ')')){
+        else if((op_code!=9 && op_code!=10 && op_code !=13) && (current_char == '(' || current_char == ')')){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
@@ -710,22 +715,22 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
-            }
-            if(op_code == 9 || op_code == 10 || op_code == 13){
-                if(char_num == 0){
-                    is_open++;
-                }else{
-                    error_def = "Invalid syntax";
-                    register_new_error(line_counter, error_def);
-                    return -1;
-                }
-            }else{
+            }else if(char_num ==0){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
             }
+            else{
+                is_open++;
+            }
+            is_char = 0;
         }else if(current_char == ')' && is_open == 1){
-            is_open--;
+            is_close++;
+            if(is_close !=0 && is_space!=0){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
             char_num = 0;
         }else if(current_char == ')' && is_open == 0){
             error_def = "Invalid syntax";
@@ -733,7 +738,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             return -1;
         }else if(current_char == '+' || current_char == '-'){
             is_symbol++;
-            if(is_symbol > 1 || is_char > 0){
+            if(is_symbol > 1 || is_char > 0 ){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
@@ -758,11 +763,22 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                     is_digit++;
                 }
             }else if(current_char == ' '){
-                if(is_char != 0){
+                if(is_open != 0 && is_char == 0){
+                    error_def = "Invalid syntax";
+                    register_new_error(line_counter, error_def);
+                    return -1;
+                }
+                if(is_char != 0 || is_digit != 0){
                     is_space++;
                 }
             }else{
-                is_char++;
+                if(is_digit > 0){
+                    error_def = "Invalid syntax";
+                    register_new_error(line_counter, error_def);
+                    return -1;
+                }else{
+                    is_char++;
+                }
             }
             temp_number_of_chars = char_num;
             if(current_char != ' '){
@@ -776,6 +792,11 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             }
             printf("char num %d, current char %c \n", char_num, current_char);
         }
+    }
+    if(is_open != is_close){
+        error_def = "Invalid syntax";
+        register_new_error(line_counter, error_def);
+        return -1;
     }
     full_operand[char_num] = '\0';
     printf("full operand : %s\n", full_operand);
