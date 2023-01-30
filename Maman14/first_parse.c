@@ -20,7 +20,7 @@ int is_symbol_error = 0;
 /*TODO:
  * 1.   .ent, .ext
  * 2.   Calculate binary address values...
- * 3.   Left Exception: invalid chars in operation codes
+ * 3.   Left Exception: Add # to receive integer
  */
 
 int first_parse(char* file_name) {
@@ -150,6 +150,10 @@ int first_parse(char* file_name) {
                                     printf("\n word_parse is: %s \n" , word_parse);
                                     word_parse = strtok(NULL, "\n, ");
                                 }
+                                if(word_is_register + word_counter != 3){
+                                    error_def = "Invalid number of params";
+                                    register_new_error(line_counter, error_def);
+                                }
                                 if(word_is_register == 2){
                                     decimal_adress += word_counter;
                                     decimal_adress ++;
@@ -170,22 +174,25 @@ int first_parse(char* file_name) {
                             case 11:
                             case 12:
                                 printf("operation: %s\n", word_parse);
-                                word_counter ++;
-                                word_parse = strtok(NULL, "(, ");
-                                while(word_parse!=NULL){
+                                word_counter++;
+                                word_parse = strtok(NULL, "\n");
+                                printf("word_parse: %s\n", word_parse);
+                                if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
+                                    printf("OK");
+                                    word_parse = strtok(word_parse, "\n, ");
+                                    printf("check %s\n", word_parse);
                                     if(check_if_word_is_register(word_parse) != -1){
                                         word_is_register++;
                                     }
                                     else {
                                         word_counter++;
                                     }
-                                    word_parse = strtok(NULL, ",) \n");
-                                }
-                                number_of_parameters = word_counter + word_is_register;
-                                if(number_of_parameters != 2){
-                                    error_def = "Invalid number of params";
-                                    register_new_error(line_counter, error_def);
-                                }else{
+                                    printf("\n word_parse is: %s \n" , word_parse);
+                                    word_parse = strtok(NULL, "\n, ");
+                                    if(word_is_register + word_counter != 2){
+                                        error_def = "Invalid number of params";
+                                        register_new_error(line_counter, error_def);
+                                    }
                                     if(word_is_register == 2){
                                         decimal_adress += word_counter;
                                         decimal_adress ++;
@@ -194,10 +201,10 @@ int first_parse(char* file_name) {
                                         decimal_adress += word_counter;
                                         decimal_adress += word_is_register;
                                     }
+                                    word_is_register = 0;
+                                    word_counter = 0;
                                 }
-                                word_is_register = 0;
-                                word_counter = 0;
-                                break;
+                            break;
                             /*jmp, bne, jsr*/
                             case 9:
                             case 10:
@@ -338,28 +345,32 @@ int first_parse(char* file_name) {
                      * address counter */
                     switch(op_code) { /* Documentation is written in the order of the cases: */
                         /* mov, cmp, add, sub, lea :*/
-                        case 0:
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 6:
-                            printf("operation: %s\n", word_parse);
-                            word_counter++;
-                            word_parse = strtok(NULL, ", ");
-                            while(word_parse!=NULL){
-                                if(check_if_word_is_register(word_parse) != -1){
-                                    word_is_register++;
+                            case 0:
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 6:
+                                printf("operation: %s\n", word_parse);
+                                word_counter++;
+                                word_parse = strtok(NULL, "\n");
+                                printf("word_parse: %s\n", word_parse);
+                                if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
+                                    printf("OK");
+                                    word_parse = strtok(word_parse, "\n, ");
+                                    while(word_parse!=NULL){
+                                    if(check_if_word_is_register(word_parse) != -1){
+                                        word_is_register++;
+                                    }
+                                    else {
+                                        word_counter++;
+                                    }
+                                    printf("\n word_parse is: %s \n" , word_parse);
+                                    word_parse = strtok(NULL, "\n, ");
                                 }
-                                else {
-                                    word_counter++;
+                                if(word_is_register + word_counter != 3){
+                                    error_def = "Invalid number of params";
+                                    register_new_error(line_counter, error_def);
                                 }
-                                word_parse = strtok(NULL, ",\n ");
-                            }
-                            number_of_parameters = word_counter + word_is_register;
-                            if(number_of_parameters != 3){
-                                error_def = "Invalid number of params";
-                                register_new_error(line_counter, error_def);
-                            }else{
                                 if(word_is_register == 2){
                                     decimal_adress += word_counter;
                                     decimal_adress ++;
@@ -368,45 +379,48 @@ int first_parse(char* file_name) {
                                     decimal_adress += word_counter;
                                     decimal_adress += word_is_register;
                                 }
+                                word_is_register = 0;
+                                word_counter = 0;
                             }
-                            word_is_register = 0;
-                            word_counter = 0;
                             break;
                             /* not, clr, inc, dec, red, prn */
-                        case 4:
-                        case 5:
-                        case 7:
-                        case 8:
-                        case 11:
-                        case 12:
-                            printf("operation: %s\n", word_parse);
-                            word_counter ++;
-                            word_parse = strtok(NULL, "(, ");
-                            while(word_parse!=NULL){
-                                if(check_if_word_is_register(word_parse) != -1){
-                                    word_is_register++;
+                            case 4:
+                            case 5:
+                            case 7:
+                            case 8:
+                            case 11:
+                            case 12:
+                                printf("operation: %s\n", word_parse);
+                                word_counter++;
+                                word_parse = strtok(NULL, "\n");
+                                printf("word_parse: %s\n", word_parse);
+                                if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
+                                    printf("OK");
+                                    word_parse = strtok(word_parse, "\n, ");
+                                    printf("check %s\n", word_parse);
+                                    if(check_if_word_is_register(word_parse) != -1){
+                                        word_is_register++;
+                                    }
+                                    else {
+                                        word_counter++;
+                                    }
+                                    printf("\n word_parse is: %s \n" , word_parse);
+                                    word_parse = strtok(NULL, "\n, ");
+                                    if(word_is_register + word_counter != 2){
+                                        error_def = "Invalid number of params";
+                                        register_new_error(line_counter, error_def);
+                                    }
+                                    if(word_is_register == 2){
+                                        decimal_adress += word_counter;
+                                        decimal_adress ++;
+                                    }
+                                    else{
+                                        decimal_adress += word_counter;
+                                        decimal_adress += word_is_register;
+                                    }
+                                    word_is_register = 0;
+                                    word_counter = 0;
                                 }
-                                else {
-                                    word_counter++;
-                                }
-                                word_parse = strtok(NULL, ",) \n");
-                            }
-                            number_of_parameters = word_counter + word_is_register;
-                            if(number_of_parameters != 2){
-                                error_def = "Invalid number of params";
-                                register_new_error(line_counter, error_def);
-                            }else{
-                                if(word_is_register == 2){
-                                    decimal_adress += word_counter;
-                                    decimal_adress ++;
-                                }
-                                else{
-                                    decimal_adress += word_counter;
-                                    decimal_adress += word_is_register;
-                                }
-                            }
-                            word_is_register = 0;
-                            word_counter = 0;
                             break;
                             /*jmp, bne, jsr*/
                         case 9:
@@ -623,10 +637,15 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
     char *error_def;
     char current_char;
     char *full_operand;
-
-    int is_comma;
-    int is_open;
+    int temp_number_of_chars = 0;
+    int is_comma = 0;
+    int is_open = 0;
+    int is_symbol = 0;
     int char_num = 0;
+    int is_digit = 0;
+    int is_char = 0;
+    int is_space = 0;
+
     /* Catching the minimum operands for each op code */
     if ((op_code >= 0 && op_code <= 13 && operand_phrase == NULL ) || (op_code > 13 && operand_phrase != NULL)){
         error_def = "Invalid syntax";
@@ -641,8 +660,8 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
     for (current_char = *temp_string; current_char != '\0'; current_char = *++temp_string) {
         printf("current_char %c\n", current_char);
         /* Not Valid chars */
-        if(current_char != '-' && current_char != ',' && current_char != '+' && current_char != ')' && current_char != '('
-        && (current_char > '9' || current_char <'0') && (isalpha(current_char) == 0)){
+        if(current_char != ' ' && current_char != '-' && current_char != ',' && current_char != '+' && current_char != ')'
+        && current_char != '(' && (isdigit(current_char) == 0) && (isalpha(current_char) == 0)){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
@@ -653,30 +672,109 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 return -1;
             }
         if(current_char == ','){
+            if(op_code == 4 || op_code == 5 || op_code == 7 || op_code == 8 || op_code == 11 || op_code == 12){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
             if(*(temp_string+1) == '\0'){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
             }
             is_comma++;
+            printf("comma count : %d\n", is_comma);
+            if(is_comma > 1){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }else if(is_char > 0 && is_digit != 0){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }else if(is_symbol == 1 && is_char > 0){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
             char_num++;
             full_operand[char_num] = '\0';
             printf("full operand : %s\n", full_operand);
             char_num = 0;
+            is_symbol = 0;
+            is_char = 0;
+            is_digit = 0;
+            is_space = 0;
         }else if(current_char == '('){
             if(*(temp_string+1) == '\0'){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
             }
-            is_open++;
+            if(op_code == 9 || op_code == 10 || op_code == 13){
+                if(char_num == 0){
+                    is_open++;
+                }else{
+                    error_def = "Invalid syntax";
+                    register_new_error(line_counter, error_def);
+                    return -1;
+                }
+            }else{
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
         }else if(current_char == ')' && is_open == 1){
             is_open--;
             char_num = 0;
-        }else{
-            printf("char num %d, current char %c \n", char_num, current_char);
+        }else if(current_char == ')' && is_open == 0){
+            error_def = "Invalid syntax";
+            register_new_error(line_counter, error_def);
+            return -1;
+        }else if(current_char == '+' || current_char == '-'){
+            is_symbol++;
+            if(is_symbol > 1 || is_char > 0){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
             full_operand[char_num] = current_char;
             char_num++;
+        }
+        else{
+            if(is_symbol == 1){
+                if(isdigit(current_char)){
+                    printf("Number OK\n");
+                    is_digit++;
+                }else{
+                    error_def = "Invalid syntax";
+                    register_new_error(line_counter, error_def);
+                    return -1;
+                }
+            }
+            else if(isdigit(current_char)){
+                /* Opening digit */
+                if(char_num == 0){
+                    is_digit++;
+                }
+            }else if(current_char == ' '){
+                if(is_char != 0){
+                    is_space++;
+                }
+            }else{
+                is_char++;
+            }
+            temp_number_of_chars = char_num;
+            if(current_char != ' '){
+                full_operand[char_num] = current_char;
+                char_num++;
+            }
+            if(temp_number_of_chars != char_num && is_space!=0){
+                error_def = "Invalid syntax";
+                register_new_error(line_counter, error_def);
+                return -1;
+            }
+            printf("char num %d, current char %c \n", char_num, current_char);
         }
     }
     full_operand[char_num] = '\0';
