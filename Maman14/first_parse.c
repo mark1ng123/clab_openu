@@ -38,7 +38,6 @@ int first_parse(char* file_name) {
     int IC =0, DC = 0;
     int is_qoute = 0;
     int op_code;
-    int number_of_parameters;
     int data_instruction_code;
     int word_is_register = 0;
     int line_counter = 1;
@@ -138,7 +137,7 @@ int first_parse(char* file_name) {
                                 word_parse = strtok(NULL, "\n");
                                 printf("word_parse: %s\n", word_parse);
                                 if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                    printf("OK");
+                                    printf("OK\n");
                                     word_parse = strtok(word_parse, "\n, ");
                                     while(word_parse!=NULL){
                                     if(check_if_word_is_register(word_parse) != -1){
@@ -178,7 +177,7 @@ int first_parse(char* file_name) {
                                 word_parse = strtok(NULL, "\n");
                                 printf("word_parse: %s\n", word_parse);
                                 if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                    printf("OK");
+                                    printf("OK\n");
                                     word_parse = strtok(word_parse, "\n, ");
                                     printf("check %s\n", word_parse);
                                     if(check_if_word_is_register(word_parse) != -1){
@@ -358,7 +357,7 @@ int first_parse(char* file_name) {
                                 word_parse = strtok(NULL, "\n");
                                 printf("word_parse: %s\n", word_parse);
                                 if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                    printf("OK");
+                                    printf("OK\n");
                                     word_parse = strtok(word_parse, "\n, ");
                                     while(word_parse!=NULL){
                                     if(check_if_word_is_register(word_parse) != -1){
@@ -398,7 +397,7 @@ int first_parse(char* file_name) {
                                 word_parse = strtok(NULL, "\n");
                                 printf("word_parse: %s\n", word_parse);
                                 if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                    printf("OK");
+                                    printf("OK\n");
                                     word_parse = strtok(word_parse, "\n, ");
                                     printf("check %s\n", word_parse);
                                     if(check_if_word_is_register(word_parse) != -1){
@@ -430,22 +429,25 @@ int first_parse(char* file_name) {
                         case 10:
                         case 13:
                             printf("operation: %s\n", word_parse);
-                            word_counter ++;
-                            word_parse = strtok(NULL, "(, ");
-                            while(word_parse!=NULL){
-                                if(check_if_word_is_register(word_parse) != -1){
-                                    word_is_register++;
+                            word_counter++;
+                            word_parse = strtok(NULL, "\n");
+                            printf("test: %s\n", word_parse);
+                            if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
+                                printf("OK\n");
+                                word_parse = strtok(word_parse, "(, ");
+                                while(word_parse != NULL){
+                                    if(check_if_word_is_register(word_parse) != -1){
+                                        word_is_register++;
+                                    }
+                                    else {
+                                        word_counter++;
+                                    }
+                                    word_parse = strtok(NULL, ",) \n");
                                 }
-                                else {
-                                    word_counter++;
+                                if(word_is_register + word_counter != 4 && word_counter + word_is_register !=2){
+                                    error_def = "Invalid number of params";
+                                    register_new_error(line_counter, error_def);
                                 }
-                                word_parse = strtok(NULL, ",) \n");
-                            }
-                            number_of_parameters = word_counter + word_is_register;
-                            if(number_of_parameters != 2 && number_of_parameters != 4){
-                                error_def = "Invalid number of params";
-                                register_new_error(line_counter, error_def);
-                            }else{
                                 if(word_is_register == 2){
                                     decimal_adress += word_counter;
                                     decimal_adress ++;
@@ -454,9 +456,9 @@ int first_parse(char* file_name) {
                                     decimal_adress += word_counter;
                                     decimal_adress += word_is_register;
                                 }
+                                word_is_register = 0;
+                                word_counter = 0;
                             }
-                            word_is_register = 0;
-                            word_counter = 0;
                             break;
                             /* rts, stop */
                         case 14:
@@ -650,6 +652,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
     int is_digit = 0;
     int is_char = 0;
     int is_space = 0;
+    
 
     /* Catching the minimum operands for each op code */
     if ((op_code >= 0 && op_code <= 13 && operand_phrase == NULL ) || (op_code > 13 && operand_phrase != NULL)){
@@ -663,7 +666,6 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
     strcpy(temp_string, operand_phrase);
 
     for (current_char = *temp_string; current_char != '\0'; current_char = *++temp_string) {
-        printf("current_char %c\n", current_char);
         /* Not Valid chars */
         if(current_char != ' ' && current_char != '-' && current_char != ',' && current_char != '+' && current_char != ')'
         && current_char != '(' && (isdigit(current_char) == 0) && (isalpha(current_char) == 0)){
@@ -688,7 +690,6 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 return -1;
             }
             is_comma++;
-            printf("comma count : %d\n", is_comma);
             if(is_comma > 1){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
