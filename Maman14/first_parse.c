@@ -805,6 +805,11 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                     register_new_error(line_counter, error_def);
                     return -1;
                 }else{
+                    if(is_imidiate!=0){
+                        error_def = "Invalid syntax";
+                        register_new_error(line_counter, error_def);
+                        return -1;
+                    }
                     is_char++;
                 }
             }
