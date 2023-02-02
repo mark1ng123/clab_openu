@@ -19,8 +19,10 @@ int is_symbol_error = 0;
 
 /*TODO:
  * 1.   .ent, .ext
- * 2.   Calculate binary address values...
- * 3.   Left Exception: Add # but Where?
+ * 2.   Split code to assembler_helper_function header.
+ * 3.   Make documentation.
+ * 4.   Split errors to functions, and define errors better.
+ * 5.   Calculate binary address values...
  */
 
 int first_parse(char* file_name) {
