@@ -513,15 +513,15 @@ int first_parse(char* file_name) {
     free(word_parse);
     free(rest_of_the_line);
     free(reading_line);
-
     is_error = return_is_error();
     if(is_error == 1){
         print_and_free_error();
         free_symbols();
+        fclose(am_file);
+        return is_error;
     }
     print_symbols();
     printf("IC: %d, DC: %d\n", IC, DC);
     fclose(am_file);
-    printf("is_error: %d\n", is_error);
     return is_error;
 }

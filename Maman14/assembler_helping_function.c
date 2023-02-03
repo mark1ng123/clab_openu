@@ -199,7 +199,6 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
 
     int char_num = 0;
     int temp_number_of_chars = 0;
-    int char_idx = 0;
 
     /*Flags*/
     int is_comma = 0;
@@ -282,12 +281,14 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 full_operand[char_num] = '\0';
             }
             printf("full operand : %s\n", full_operand);
+            /* Resetting indexes for next operand*/
             char_num = 0;
             is_symbol = 0;
             is_char = 0;
             is_digit = 0;
             is_space = 0;
             is_imidiate = 0;
+            /* Works on op codes that can take ( or ) but algorithm stays the same just resetting points differ */
         }else if(current_char == '('){
             if(*(temp_string+1) == '\0'){
                 error_def = "Invalid syntax";
@@ -304,24 +305,30 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             printf("full operand : %s\n", full_operand);
             char_num = 0;
             is_char = 0;
+            /* One closing one Opening */
         }else if(current_char == ')' && is_open == 1){
             is_close++;
-            if(is_close !=0 && is_space!=0){
+            /* Spaces not allowed */
+            if(is_close != 0 && is_space!=0){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
             }
             char_num = 0;
+            /* No opening */
         }else if(current_char == ')' && is_open == 0){
             error_def = "Invalid syntax";
             register_new_error(line_counter, error_def);
             return -1;
+            /* Symbol conditioning */
         }else if(current_char == '+' || current_char == '-'){
             is_symbol++;
+            /* Symbol and a char together */
             if(is_symbol > 1 || is_char > 0 ){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
                 return -1;
+            /* symbol index is not right in the operand  */
             }else if(is_symbol == 1 && char_num != 0){
                 error_def = "Invalid syntax";
                 register_new_error(line_counter, error_def);
@@ -329,6 +336,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             }
             full_operand[char_num] = current_char;
             char_num++;
+            /* immediate action */
         }else if(current_char == '#'){
             is_imidiate++;
             if(char_num != 0){
@@ -337,7 +345,9 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 return -1;
             }
         }else{
+            /* Symbol and Immediate action */
             if(is_symbol == 1 && is_imidiate == 1){
+                /* Has to be digit */
                 if(isdigit(current_char)){
                     printf("Number OK\n");
                     is_digit++;
@@ -347,17 +357,20 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                     return -1;
                 }
             }
+            /* Digit with Immediate action no symbol */
             else if(isdigit(current_char) && is_imidiate == 1){
                 /* Opening digit */
                 if(char_num == 0){
                     is_digit++;
                 }
+                /* Opening number without immediate action */
             }else if(isdigit(current_char) && is_imidiate == 0){
                 if(is_char == 0){
                     error_def = "Invalid syntax";
                     register_new_error(line_counter, error_def);
                     return -1;
                 }
+                /* Spaces conditioning */
             }else if(current_char == ' '){
                 if(is_open != 0 && is_char == 0){
                     error_def = "Invalid syntax";
@@ -368,6 +381,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                     is_space++;
                 }
             }else{
+                /* digits with chars */
                 if(is_digit > 0){
                     error_def = "Invalid syntax";
                     register_new_error(line_counter, error_def);

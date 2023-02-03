@@ -189,7 +189,7 @@ void free_error();
 int return_is_error();
 
 /*
- * check_if_word_is_op method:
+ * re_occuring_symbol_name method:
  * Input:
  * 1. head -> head of symbols in linked list.
  * 2. potential_symbol_name -> new symbol that is not inserted the linked list.
@@ -200,7 +200,8 @@ int return_is_error();
 struct Symbol *re_occuring_symbol_name(struct Symbol *head, char *potential_symbol_name);
 
 /*
- * check_if_word_is_op method:
+ * insert_new_symbol method:
+ * Checks if there is no reoccurrences before using the insert_symbol method, if there are it will register an error.
  * Input:
  * 1. line -> save error location.
  * 2. symbol_name -> symbol name.
@@ -210,15 +211,47 @@ struct Symbol *re_occuring_symbol_name(struct Symbol *head, char *potential_symb
  */
 void insert_new_symbol(int line, char *symbol_name);
 
+/*
+ * allocate_memory_for_symbol method:
+ * Has no input, all she does is to allocate new memory for
+ * potential symbol to enter, return -1 if we weren't able to allocate memory and 0 if memory was allocated.
+ */
 int allocate_memory_for_symbol();
 
+/*
+ * append_decimal_adress_to_symbol method:
+ * Setter method, sets decimal adress into symbol struct.
+ * Input:
+ * 1. decimal_adress -> the adress in which the potential symbol is located.
+ */
 void append_decimal_adress_to_symbol(int decimal_adress);
 
+/*
+ * insert_symbol method:
+ * The method does all the link list algorithm to insert the symbol in the right place, moves the head/tail
+ * as much as needed to give the new symbol memory to be attached to.
+ * Input:
+ * 1. symbol_name -> the name of the new symbol.
+ */
 void insert_symbol(char* symbol_name);
 
+/*
+ * return_if_symbol_head_null method:
+ * Does exactly what the name says,
+ * if the head of the symbol linked list is null it return 0
+ * otherwise returns 1.
+ */
 int return_if_symbol_head_null();
 
+/*
+ * print_symbols method:
+ * printing all symbols from head to tail.
+ */
 void print_symbols();
 
+/*
+ * free_symbols method:
+ * free the memory of the symbol list from head to tail.
+ */
 void free_symbols();
 #endif
