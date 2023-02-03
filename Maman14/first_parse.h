@@ -1,6 +1,3 @@
-/*
- *
- */
 
 #ifndef FIRST_PARSE_H
 #define FIRST_PARSE_H

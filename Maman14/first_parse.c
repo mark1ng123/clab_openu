@@ -1,7 +1,7 @@
 #include "first_parse.h"
 #include "check_input_files.h"
 #include "assembler_helping_function.h"
-
+#include "error_handeling.h"
 
 /*TODO:
  * 1.   .ent, .ext
