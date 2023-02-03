@@ -1,20 +1,9 @@
 #include "assembler_helping_function.h"
+#include "structures.h"
+#include "global_operations.h"
+#include "error_handeling.h"
 
-/* Globals */
-char *valid_opcode[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec","jmp", "bne", "red", "prn",
-                              "jsr", "rts", "stop"};
-char *data_instruction[] = {".data", ".string"};
-char *entry_extern_instruction[] = {".extern", ".entry"};
-char *valid_register_names[] = {"r0","r1", "r2", "r3", "r4", "r5", "r6","r7"};
 
-/* Declarations for flags */
-int is_error = 0;
-int is_symbol_error = 0;
-
-/* initialization for saving the Errors */
-struct Error *errors_head = NULL;
-struct Error *errors_tail = NULL;
-struct Error *error = NULL;
 
 /* intialization for saving the Symbols */
 struct Symbol *symbol_head = NULL;
@@ -82,41 +71,6 @@ int string_to_number_conv(char *string){
 
 int calc_ascii_in_string (char char_string){
     return (int)char_string;
-}
-
-void register_new_error(int line_number, char* error_definition){
-    error = malloc(sizeof(struct Error));
-    error->line_number = line_number;
-    error->error_defenition = malloc(sizeof(char)*MAX_LINE_LENGTH);
-    strcpy(error->error_defenition, error_definition);
-    /*flag*/
-    is_error = 1;
-    if (errors_head == NULL) {
-        errors_head = error;
-        errors_tail = error;
-        errors_head->next = NULL;
-    } else {
-        errors_tail->next = error;
-        errors_tail = error;
-        errors_tail->next = NULL;
-    }
-}
-
-void print_and_free_error(){
-        while(errors_head != NULL){
-            printf("Error: %s in line: %d\n", errors_head->error_defenition, errors_head->line_number);
-            free_error();
-            errors_head = errors_head->next;
-        }
-}
-
-void free_error(){
-    free(errors_head->error_defenition);
-    free(errors_head);
-}
-
-int return_is_error(){
-    return is_error;
 }
 
 int check_valid_symbol_name(char *symbol, int line){

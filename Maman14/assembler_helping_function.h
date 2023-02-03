@@ -14,29 +14,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
-/*
- * The Error structure,
- * Every time an error will occur, it will have a line number, a text definition of the error
- * and next pointer to another Error.
- */
-struct Error{
-    int line_number;
-    char* error_defenition;
-    struct Error *next;
-};
-
-/*
- * The Symbol structure,
- * Every time a Symbol will be saved, it will have a name saved, the address in the file
- * and next pointer to another Symbol.
- */
-struct Symbol{
-    char *name;
-    int decimal_adress;
-    struct Symbol *next;
-};
-
 /*
  * check_is_line_starting_with_symbol method:
  * Input:
@@ -78,7 +55,7 @@ int check_if_word_is_data_instruction(char *optional_instruction);
 int check_if_word_is_register(char *optional_register);
 
 /*
- * check_if_word_is_data_instruction method:
+ * check_if_word_entry_extern_instruction method:
  * Input:
  * 1. optional_instruction -> the word in the line is a instruction name.
  * Output:
@@ -160,33 +137,6 @@ int is_valid_data_instruct(char * string, int line);
  */
 int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_code);
 
-/*
- * is_valid_operand_assignment method:
- * Input:
- * 1. line_number -> file line were the error was found
- * 2. error_definition -> the given error from function in use
- */
-void register_new_error(int line_number, char* error_definition);
-
-/*
- * test_print_error method:
- * check if error head is not null, if is not null print the error_definition
- */
-void print_and_free_error();
-
-/*
- * free_error method:
- * free the memory of the error pointer
- */
-void free_error();
-
-/*
- * return_is_error method:
- * Output:
- * 1. returns flag 0 -> error was not detected in another function.
- * 2. returns flag 1 -> error was detected in another function.
- */
-int return_is_error();
 
 /*
  * re_occuring_symbol_name method:
