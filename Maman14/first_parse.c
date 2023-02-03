@@ -5,9 +5,6 @@
 
 /*TODO:
  * 1.   .ent, .ext
- * 2.   Split code to assembler_helper_function header.
- * 3.   Make documentation.
- * 4.   Split errors to functions, and define errors better.
  * 5.   Calculate binary address values...
  */
 
