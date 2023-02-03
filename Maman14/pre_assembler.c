@@ -70,6 +70,7 @@ int pre_assemble(FILE *as_input_file, char* file_name) {
             } else {
                 tail->next = macro;
                 tail = macro;
+                tail->next = NULL;
             }
             is_read_mcr = 0;
         }
