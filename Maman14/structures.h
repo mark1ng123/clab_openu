@@ -1,5 +1,6 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
+#define WORD_SIZE 14
 /*
  * The Error structure,
  * Every time an error will occur, it will have a line number, a text definition of the error
@@ -20,5 +21,12 @@ struct Symbol{
     char *name;
     int decimal_adress;
     struct Symbol *next;
+};
+
+struct BinaryList{
+    char binary_code[WORD_SIZE];
+    int decimal_adress;
+    int line;
+    struct BinaryList *next;
 };
 #endif

@@ -10,6 +10,12 @@ struct Symbol *symbol_head = NULL;
 struct Symbol *symbol_tail = NULL;
 struct Symbol *symbol = NULL;
 
+/* intialization for saving the Binary machine code */
+struct BinaryList *binary_head = NULL;
+struct BinaryList *binary_tail = NULL;
+struct BinaryList *current_binary = NULL;
+
+
 /* Functions */
 int check_is_line_starting_with_symbol(char *symbol){
     if(symbol[strlen(symbol)-1] == ':'){
@@ -525,5 +531,148 @@ void free_symbols(){
         free(symbol_head->name);
         free(symbol_head);
         symbol_head = symbol_head->next;
+    }
+}
+
+int allocate_memory_for_binary_code(){
+    int current_digit = 0;
+    current_binary = malloc(sizeof(struct BinaryList));
+    if(current_binary == NULL){
+        printf("Unable to allocate memory for symbol\n");
+        return -1;
+    }
+    for(; current_digit<WORD_SIZE; current_digit++){
+        current_binary->binary_code[current_digit] = '0';
+    }
+    current_binary->binary_code[WORD_SIZE] = '\0';
+    return 0;
+}
+
+/*
+ * TODO:
+ *  1. Add imidiate sorting. (#)
+ *  2. Add functionalty to one operand operations.
+ *  3. Add functionalty to 3 operand operations. ()
+ *  4. .data, .string
+ */
+void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int number_of_registers, int line){
+    int op_code_index_start = 4;
+    int number_of_operand = 0;
+    int dest_operand_start_idx = 10;
+    int source_operand_start_idx = 8;
+    int source_operand_solo_line = 0;
+    int dest_operand_solo_line = 6;
+    int register_index = 0;
+    int total_lines_needed = 0;
+    char *binary_first_operand_code = malloc(OPERANDS_OFFSET);
+    char *binary_second_operand_code = malloc(OPERANDS_OFFSET);
+    printf("test\n");
+    printf("operation code: %d\n", op_code);
+    /* Insert new binary */
+    if(allocate_memory_for_binary_code() == 0){
+        current_binary->line = line;
+        current_binary->decimal_adress = decimal_adress;
+        memcpy(current_binary->binary_code + op_code_index_start, binary_op_code_array[op_code], BINARY_OP_CODE);
+        operand_phrase = strtok(operand_phrase, "\n, ");
+        while(operand_phrase!=NULL) {
+            number_of_operand++;
+            if (check_if_word_is_register(operand_phrase) != -1) {
+                register_index = check_if_word_is_register(operand_phrase);
+                /* Source operand */
+                if(number_of_operand == 1){
+                    strcpy(binary_first_operand_code, binary_register_code_array[register_index]);
+                    memcpy(current_binary->binary_code+source_operand_start_idx, "11", REGISTER_SORTING);
+                }else{  /* Dest operand */
+                    strcpy(binary_second_operand_code, binary_register_code_array[register_index]);
+                    memcpy(current_binary->binary_code+dest_operand_start_idx, "11", REGISTER_SORTING);
+                }
+                /* Imediate sorting */
+            } else if(strchr(operand_phrase, '#')){
+                /* Source */
+                if(number_of_operand == 1){
+                    memcpy(current_binary->binary_code+source_operand_start_idx, "00", REGISTER_SORTING);
+                }else{  /* Dest operand */
+                    memcpy(current_binary->binary_code+dest_operand_start_idx, "00", REGISTER_SORTING);
+                }
+            }
+            else{
+                /* Source */
+                if(number_of_operand == 1){
+                    memcpy(current_binary->binary_code+source_operand_start_idx, "01", REGISTER_SORTING);
+                }else{  /* Dest operand */
+                    memcpy(current_binary->binary_code+dest_operand_start_idx, "01", REGISTER_SORTING);
+                }
+                binary_second_operand_code = NULL;
+            }
+            operand_phrase = strtok(NULL, "\n, ");
+        }
+        printf("current : %s\n", current_binary->binary_code);
+        /* Add to binary list */
+        insert_new_binary();
+
+        /* Need only one line of binary*/
+        if(number_of_registers == 2){
+            total_lines_needed = 1;
+        }else{
+            total_lines_needed = 2;
+        }
+        while(number_of_operand!=0){
+            if(total_lines_needed == 2){
+                if(allocate_memory_for_binary_code() == 0) {
+                    if(number_of_operand == 2){
+                        printf("source:%s, index = %d\n", binary_first_operand_code, source_operand_solo_line);
+                        memcpy(current_binary->binary_code+source_operand_solo_line, binary_first_operand_code, OPERANDS_OFFSET);
+                    }
+                    else{
+                        if(binary_second_operand_code == NULL){
+                            memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
+                        }
+                    }
+                }
+            }else{
+                allocate_memory_for_binary_code();
+                number_of_operand--;
+                memcpy(current_binary->binary_code+source_operand_solo_line, binary_first_operand_code, OPERANDS_OFFSET);
+                memcpy(current_binary->binary_code+dest_operand_solo_line, binary_second_operand_code, OPERANDS_OFFSET);
+            }
+            if(total_lines_needed == 1){
+                decimal_adress++;
+                total_lines_needed--;
+            }else if(total_lines_needed == 2){
+                decimal_adress++;
+            }
+            current_binary->line = line;
+            current_binary->decimal_adress = decimal_adress;
+            insert_new_binary();
+            number_of_operand--;
+        }
+    }
+}
+
+void insert_new_binary(){
+    printf("current_binary: %s\n", current_binary->binary_code);
+    if (binary_head == NULL) {
+        binary_head = current_binary;
+        binary_tail = current_binary;
+        binary_tail->next = NULL;
+    } else {
+        binary_tail->next = current_binary;
+        binary_tail = current_binary;
+        binary_tail->next = NULL;
+    }
+}
+
+void print_binary_list(){
+    while(binary_head != NULL){
+        printf("Line: %d, Binary code: %s ,in adress: %d\n", binary_head->line,binary_head->binary_code, binary_head->decimal_adress);
+        binary_head = binary_head->next;
+    }
+}
+
+void free_binary_list(){
+    while(binary_head != NULL){
+        free(binary_head->binary_code);
+        free(binary_head);
+        binary_head = binary_head->next;
     }
 }

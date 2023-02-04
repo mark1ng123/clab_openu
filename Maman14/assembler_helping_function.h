@@ -9,6 +9,9 @@
 #define NUMBER_OF_ENT_EXT 2
 #define NUMBER_OF_REGISTERS 8
 #define BASE_DECIMAL_ADD 100
+#define BINARY_OP_CODE 4
+#define REGISTER_SORTING 2
+#define OPERANDS_OFFSET 6
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -204,4 +207,14 @@ void print_symbols();
  * free the memory of the symbol list from head to tail.
  */
 void free_symbols();
+
+void binary_encoding(int op_code, int decimal_adress, char *operand_phrase, int number_of_registers, int line);
+
+int allocate_memory_for_binary_code();
+
+void print_binary_list();
+
+void free_binary_list();
+
+void insert_new_binary();
 #endif
