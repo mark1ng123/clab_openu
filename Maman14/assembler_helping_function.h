@@ -12,6 +12,7 @@
 #define BINARY_OP_CODE 4
 #define REGISTER_SORTING 2
 #define OPERANDS_OFFSET 6
+#define BINARY_TWOS 8
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -217,4 +218,11 @@ void print_binary_list();
 void free_binary_list();
 
 void insert_new_binary();
+
+int int_to_ascii(int number);
+
+char* int_to_binary(int number);
+
+char* compliment_two_binary(char* binary_number);
+
 #endif

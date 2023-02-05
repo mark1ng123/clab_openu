@@ -72,7 +72,11 @@ int is_skip_line(char *potential_symbol_name) {
 }
 
 int string_to_number_conv(char *string){
-    return '0' + atoi(string);
+    return strtol(string, NULL, 10);
+}
+
+int int_to_ascii(int number){
+    return '0' + number;
 }
 
 int calc_ascii_in_string (char char_string){
@@ -548,10 +552,54 @@ int allocate_memory_for_binary_code(){
     return 0;
 }
 
+char* int_to_binary(int number){
+    char* reversed_binary_number = malloc(OPERANDS_OFFSET);
+    unsigned char char_idx = 0;
+    int new_number = 0;
+    int left = 0;
+    int right = OPERANDS_OFFSET-1;
+    int carry = 1;
+    char temp;
+    /* Initialize */
+    for(; char_idx<BINARY_TWOS; char_idx++){
+        reversed_binary_number[char_idx]='0';
+    }
+    /* Calc binary */
+    char_idx = 0;
+    for(; number>0; char_idx++){
+        new_number = number % 2;
+        reversed_binary_number[char_idx] = new_number + '0';
+        number = number/2;
+    }
+    while(left < right){
+        temp = reversed_binary_number[right];
+        reversed_binary_number[right] = reversed_binary_number[left];
+        reversed_binary_number[left] = temp;
+        left++;
+        right--;
+    }
+    return reversed_binary_number;
+}
+
+char* compliment_two_binary(char* binary_number){
+    char* twos_binary_number = malloc(OPERANDS_OFFSET);
+    int char_idx = 0;
+    int carry = 1;
+    for(char_idx = OPERANDS_OFFSET-1; char_idx>=0; char_idx--){
+        if(binary_number[char_idx] == '1' && carry == 1){
+            twos_binary_number[char_idx] = '1';
+            carry = 0;
+        }else{
+            memcpy(twos_binary_number+char_idx, binary_number+char_idx, 1);
+        }
+    }
+    return twos_binary_number;
+}
+
+
 /*
  * TODO:
- *  1. Add imidiate sorting. (#)
- *  2. Add functionalty to one operand operations.
+ *  2. Add functionalty to one operand operations. (did i mistakely did it, check tuesday)
  *  3. Add functionalty to 3 operand operations. ()
  *  4. .data, .string
  */
@@ -562,11 +610,14 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
     int source_operand_start_idx = 8;
     int source_operand_solo_line = 0;
     int dest_operand_solo_line = 6;
+    int solo_operand = 0;
     int register_index = 0;
     int total_lines_needed = 0;
-    char *binary_first_operand_code = malloc(OPERANDS_OFFSET);
-    char *binary_second_operand_code = malloc(OPERANDS_OFFSET);
-    printf("test\n");
+    char *number;
+    int ascii_number;
+    char *ascii_in_binary;
+    char *binary_src_operand_code = malloc(OPERANDS_OFFSET);
+    char *binary_dest_operand_code = malloc(OPERANDS_OFFSET);
     printf("operation code: %d\n", op_code);
     /* Insert new binary */
     if(allocate_memory_for_binary_code() == 0){
@@ -580,18 +631,30 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 register_index = check_if_word_is_register(operand_phrase);
                 /* Source operand */
                 if(number_of_operand == 1){
-                    strcpy(binary_first_operand_code, binary_register_code_array[register_index]);
+                    strcpy(binary_src_operand_code, binary_register_code_array[register_index]);
                     memcpy(current_binary->binary_code+source_operand_start_idx, "11", REGISTER_SORTING);
                 }else{  /* Dest operand */
-                    strcpy(binary_second_operand_code, binary_register_code_array[register_index]);
+                    strcpy(binary_dest_operand_code, binary_register_code_array[register_index]);
                     memcpy(current_binary->binary_code+dest_operand_start_idx, "11", REGISTER_SORTING);
                 }
                 /* Imediate sorting */
             } else if(strchr(operand_phrase, '#')){
                 /* Source */
                 if(number_of_operand == 1){
+                    number = malloc(strlen(operand_phrase)-1);
+                    strcpy(number, operand_phrase+1);
+                    ascii_number = int_to_ascii(string_to_number_conv(number));
+                    ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number));
+                    strcpy(binary_src_operand_code, ascii_in_binary);
+                    printf("%s testing \n", binary_src_operand_code);
                     memcpy(current_binary->binary_code+source_operand_start_idx, "00", REGISTER_SORTING);
                 }else{  /* Dest operand */
+                    number = malloc(strlen(operand_phrase)-1);
+                    strcpy(number, operand_phrase+1);
+                    ascii_number = int_to_ascii(string_to_number_conv(number));
+                    ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number));
+                    strcpy(binary_dest_operand_code, ascii_in_binary);
+                    printf("%s testing \n", binary_dest_operand_code);
                     memcpy(current_binary->binary_code+dest_operand_start_idx, "00", REGISTER_SORTING);
                 }
             }
@@ -602,10 +665,14 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 }else{  /* Dest operand */
                     memcpy(current_binary->binary_code+dest_operand_start_idx, "01", REGISTER_SORTING);
                 }
-                binary_second_operand_code = NULL;
+                binary_dest_operand_code = NULL;
             }
             operand_phrase = strtok(NULL, "\n, ");
         }
+        if(number_of_operand == 1){
+            solo_operand = 1;
+        }
+        printf("number of operands : %d\n", number_of_operand);
         printf("current : %s\n", current_binary->binary_code);
         /* Add to binary list */
         insert_new_binary();
@@ -620,20 +687,29 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
             if(total_lines_needed == 2){
                 if(allocate_memory_for_binary_code() == 0) {
                     if(number_of_operand == 2){
-                        printf("source:%s, index = %d\n", binary_first_operand_code, source_operand_solo_line);
-                        memcpy(current_binary->binary_code+source_operand_solo_line, binary_first_operand_code, OPERANDS_OFFSET);
+                        printf("test1\n");
+                        printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
+                        memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
                     }
                     else{
-                        if(binary_second_operand_code == NULL){
+                        if(binary_dest_operand_code == NULL){
+                            printf("test2\n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
+                        }else{
+                            if(solo_operand == 0){
+                                printf("test3\n");
+                                memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
+                            }else{
+                                memcpy(current_binary->binary_code+dest_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
+                            }
                         }
                     }
                 }
             }else{
                 allocate_memory_for_binary_code();
                 number_of_operand--;
-                memcpy(current_binary->binary_code+source_operand_solo_line, binary_first_operand_code, OPERANDS_OFFSET);
-                memcpy(current_binary->binary_code+dest_operand_solo_line, binary_second_operand_code, OPERANDS_OFFSET);
+                memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
+                memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
             }
             if(total_lines_needed == 1){
                 decimal_adress++;
@@ -646,6 +722,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
             insert_new_binary();
             number_of_operand--;
         }
+        solo_operand = 0;
     }
 }
 
