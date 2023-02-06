@@ -524,10 +524,13 @@ int return_if_symbol_head_null(){
 }
 
 void print_symbols(){
+    struct Symbol *temp = NULL;
+    temp = symbol_head;
     while(symbol_head != NULL){
         printf("Symbol: %s in adress: %d\n", symbol_head->name, symbol_head->decimal_adress);
         symbol_head = symbol_head->next;
     }
+    symbol_head = temp;
 }
 
 void free_symbols(){
@@ -558,7 +561,6 @@ char* int_to_binary(int number){
     int new_number = 0;
     int left = 0;
     int right = OPERANDS_OFFSET-1;
-    int carry = 1;
     char temp;
     /* Initialize */
     for(; char_idx<BINARY_TWOS; char_idx++){
@@ -671,6 +673,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
         }
         if(number_of_operand == 1){
             solo_operand = 1;
+            free(binary_dest_operand_code);
         }
         printf("number of operands : %d\n", number_of_operand);
         printf("current : %s\n", current_binary->binary_code);
@@ -740,10 +743,13 @@ void insert_new_binary(){
 }
 
 void print_binary_list(){
+    struct BinaryList *temp = NULL;
+    temp = binary_head;
     while(binary_head != NULL){
         printf("Line: %d, Binary code: %s ,in adress: %d\n", binary_head->line,binary_head->binary_code, binary_head->decimal_adress);
         binary_head = binary_head->next;
     }
+    binary_head = temp;
 }
 
 void free_binary_list(){
