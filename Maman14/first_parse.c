@@ -5,7 +5,7 @@
 
 /*TODO:
  * 1.   .ent, .ext
- * 5.   Calculate binary address values...
+ * 5.   .string .data binary
  */
 
 int first_parse(char* file_name) {

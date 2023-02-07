@@ -633,6 +633,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
     char *ascii_in_binary;
     char *binary_src_operand_code = malloc(OPERANDS_OFFSET);
     char *binary_dest_operand_code = malloc(OPERANDS_OFFSET);
+    current_binary = malloc(sizeof (struct BinaryList));
     printf("operation code: %d\n", op_code);
     /* Insert new binary */
     if(allocate_memory_for_binary_code() == 0){
@@ -929,7 +930,6 @@ void print_binary_list(){
 
 void free_binary_list(){
     while(binary_head != NULL){
-        free(binary_head->binary_code);
         free(binary_head);
         binary_head = binary_head->next;
     }
