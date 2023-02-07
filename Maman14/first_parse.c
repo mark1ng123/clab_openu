@@ -195,11 +195,19 @@ int first_parse(char* file_name) {
                                     printf("operation: %s\n", word_parse);
                                     word_counter++;
                                     word_parse = strtok(NULL, "\n");
+                                    operand_phrase = malloc(sizeof(word_parse));
+                                    strcpy(operand_phrase, word_parse);
+                                    printf("operand_phrase: %s\n", word_parse);
                                     if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
                                         printf("OK\n");
                                         word_parse = strtok(word_parse, "(, ");
                                         while(word_parse != NULL){
-                                            if(check_if_word_is_register(word_parse) != -1){
+                                            if(word_counter == 1 && check_if_word_is_register(word_parse) != -1){
+                                                error_def = "Invalid syntax";
+                                                register_new_error(line_counter, error_def);
+                                                word_counter++;
+                                            }
+                                            else if(check_if_word_is_register(word_parse) != -1){
                                                 word_is_register++;
                                             }
                                             else {
@@ -207,13 +215,11 @@ int first_parse(char* file_name) {
                                             }
                                             word_parse = strtok(NULL, ",) \n");
                                         }
-                                        if(word_is_register + word_counter != 4){
+                                        if(word_is_register + word_counter != 4 && word_counter + word_is_register !=2){
                                             error_def = "Invalid number of params";
                                             register_new_error(line_counter, error_def);
                                         }
-                                        /*
-                                        binary_encoding(op_code, decimal_adress);
-                                        */
+                                        binary_encoding(op_code, decimal_adress, operand_phrase, word_is_register, line_counter);
                                         if(word_is_register == 2){
                                             decimal_adress += word_counter;
                                             decimal_adress ++;
@@ -415,11 +421,19 @@ int first_parse(char* file_name) {
                             printf("operation: %s\n", word_parse);
                             word_counter++;
                             word_parse = strtok(NULL, "\n");
+                            operand_phrase = malloc(sizeof(word_parse));
+                            strcpy(operand_phrase, word_parse);
+                            printf("operand_phrase: %s\n", word_parse);
                             if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
                                 printf("OK\n");
                                 word_parse = strtok(word_parse, "(, ");
                                 while(word_parse != NULL){
-                                    if(check_if_word_is_register(word_parse) != -1){
+                                    if(word_counter == 1 && check_if_word_is_register(word_parse) != -1){
+                                        error_def = "Invalid syntax";
+                                        register_new_error(line_counter, error_def);
+                                        word_counter++;
+                                    }
+                                    else if(check_if_word_is_register(word_parse) != -1){
                                         word_is_register++;
                                     }
                                     else {
@@ -431,9 +445,7 @@ int first_parse(char* file_name) {
                                     error_def = "Invalid number of params";
                                     register_new_error(line_counter, error_def);
                                 }
-                                /*
-                                    binary_encoding(op_code, decimal_adress);
-                                */
+                                binary_encoding(op_code, decimal_adress, operand_phrase, word_is_register, line_counter);
                                 if(word_is_register == 2){
                                     decimal_adress += word_counter;
                                     decimal_adress ++;
