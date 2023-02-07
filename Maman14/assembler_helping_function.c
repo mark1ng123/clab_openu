@@ -680,12 +680,13 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 }
                 else{
                     /* Source */
-                    if(number_of_operand == 1){
+                    if(number_of_operand == 1 && op_code < 14){
                         memcpy(current_binary->binary_code+source_operand_start_idx, "01", REGISTER_SORTING);
+                        binary_src_operand_code = NULL;
                     }else{  /* Dest operand */
                         memcpy(current_binary->binary_code+dest_operand_start_idx, "01", REGISTER_SORTING);
+                        binary_dest_operand_code = NULL;
                     }
-                    binary_dest_operand_code = NULL;
                 }
                 operand_phrase = strtok(NULL, "\n, ");
             }
@@ -701,7 +702,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                     if(number_of_operand == 2){
                         strcpy(binary_src_operand_code, binary_register_code_array[register_index]);
                         memcpy(current_binary->binary_code+source_operand_idx_jumping_sort, "11", REGISTER_SORTING);
-                    }else if (number_of_operand == 3){  /* Dest operand */
+                    }else if (number_of_operand == 3){/* Dest operand */
                         strcpy(binary_dest_operand_code, binary_register_code_array[register_index]);
                         memcpy(current_binary->binary_code+dest_operand_idx_jumping_sort, "11", REGISTER_SORTING);
                     }else{
@@ -738,17 +739,24 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                     /* Source */
                     if(number_of_operand == 2){
                         memcpy(current_binary->binary_code+source_operand_idx_jumping_sort, "01", REGISTER_SORTING);
+                        if(binary_src_operand_code != NULL){
+                            binary_src_operand_code = NULL;
+                        }
                     }else if(number_of_operand == 3){  /* Dest operand */
                         memcpy(current_binary->binary_code+dest_operand_idx_jumping_sort, "01", REGISTER_SORTING);
+                        if(binary_dest_operand_code != NULL){
+                            binary_dest_operand_code = NULL;
+                        }
                     }else{
                         operand_phrase = strtok(NULL, ",) \n");
                         continue;
                     }
-                    binary_dest_operand_code = NULL;
+
                 }
                 operand_phrase = strtok(NULL, ",) \n");
             }
         }
+        printf("testing \n");
         if(number_of_operand == 1){
             if(op_code < 14){
                 solo_operand = 1;
@@ -794,7 +802,9 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
             if(total_lines_needed == 2 && op_code != 9 && op_code !=10 && op_code != 13){
                 if(allocate_memory_for_binary_code() == 0) {
                     if(number_of_operand == 2){
-                        if(src_number == 0){
+                        if(binary_src_operand_code == NULL){
+                            memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
+                        }else if(src_number == 0 ){
                             printf("test1\n");
                             printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                             memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
@@ -813,12 +823,17 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                                 printf("test3\n");
                                 if(dest_number == 0){
                                     memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
-                                }else{
+                                }
+                                else{
                                     memcpy(current_binary->binary_code, binary_dest_operand_code, BINARY_TWOS);
                                 }
                             }else{
                                 if(src_number == 0){
-                                    memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
+                                    if(binary_src_operand_code == NULL) {
+                                        memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
+                                    }else{
+                                        memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
+                                    }
                                 }else{
                                     memcpy(current_binary->binary_code, binary_src_operand_code, BINARY_TWOS);
                                 }
@@ -841,7 +856,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         else if(binary_dest_operand_code == NULL && number_of_operand == 1 && solo_operand == 0){
                             printf("test2\n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
-                        }else if(binary_dest_operand_code == NULL && number_of_operand == 2 && solo_operand == 0){
+                        }else if(binary_src_operand_code == NULL && number_of_operand == 2 && solo_operand == 0){
                             printf("test3\n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }else if(number_of_operand == 2 && solo_operand == 0){

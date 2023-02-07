@@ -197,7 +197,7 @@ int first_parse(char* file_name) {
                                     word_parse = strtok(NULL, "\n");
                                     operand_phrase = malloc(sizeof(word_parse));
                                     strcpy(operand_phrase, word_parse);
-                                    printf("operand_phrase: %s\n", word_parse);
+                                    printf("phrase: %s\n", word_parse);
                                     if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
                                         printf("OK\n");
                                         word_parse = strtok(word_parse, "(, ");
