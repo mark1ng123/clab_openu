@@ -555,15 +555,22 @@ int allocate_memory_for_binary_code(){
     return 0;
 }
 
-char* int_to_binary(int number){
-    char* reversed_binary_number = malloc(BINARY_TWOS);
+char* int_to_binary(int number, int op_code){
+    char* reversed_binary_number;
     unsigned char char_idx = 0;
     int new_number = 0;
     int left = 0;
-    int right = BINARY_TWOS-1;
+    int right = 0;
     char temp;
+    if(op_code < 15){
+        reversed_binary_number = malloc(BINARY_TWOS);
+        right = BINARY_TWOS;
+    }else{
+        reversed_binary_number = malloc(BINARY_TWOS + 2);
+        right = BINARY_TWOS + 2;
+    }
     /* Initialize */
-    for(; char_idx<BINARY_TWOS; char_idx++){
+    for(; char_idx<right; char_idx++){
         reversed_binary_number[char_idx]='0';
     }
     /* Calc binary */
@@ -573,6 +580,7 @@ char* int_to_binary(int number){
         reversed_binary_number[char_idx] = abs(new_number) + '0';
         number = number/2;
     }
+    right = right - 1;
     while(left < right){
         temp = reversed_binary_number[right];
         reversed_binary_number[right] = reversed_binary_number[left];
@@ -590,12 +598,12 @@ char* compliment_two_binary(char* binary_number, int number){
     if(number > 0){
         return binary_number;
     }else{
-        for(char_idx = BINARY_TWOS-1; char_idx >= 0; char_idx--){
+        for(char_idx = strlen(binary_number)-1; char_idx >= 0; char_idx--){
             if(binary_number[char_idx]=='1')
                 break;
         }
         if(char_idx == -1){
-            binary_number[BINARY_TWOS] = '1';
+            binary_number[strlen(binary_number)-1] = '1';
             return binary_number;
         }
         for(secondery_idx = char_idx-1; secondery_idx>=0; secondery_idx--){
@@ -610,10 +618,7 @@ char* compliment_two_binary(char* binary_number, int number){
 }
 
 
-/*
- * TODO:
- *  4. .data, .string
- */
+
 void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int number_of_registers, int line){
     int op_code_index_start = 4;
     int number_of_operand = 0;
@@ -662,7 +667,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         number = malloc(strlen(operand_phrase)-1);
                         strcpy(number, operand_phrase+1);
                         ascii_number = string_to_number_conv(number);
-                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number), ascii_number);
+                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
                         binary_src_operand_code = malloc(BINARY_TWOS);
                         strcpy(binary_src_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+source_operand_start_idx, "00", REGISTER_SORTING);
@@ -672,7 +677,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         number = malloc(strlen(operand_phrase)-1);
                         strcpy(number, operand_phrase+1);
                         ascii_number = int_to_ascii(string_to_number_conv(number));
-                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number), ascii_number);
+                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
                         binary_dest_operand_code = malloc(BINARY_TWOS);
                         strcpy(binary_dest_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+dest_operand_start_idx, "00", REGISTER_SORTING);
@@ -717,7 +722,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         number = malloc(strlen(operand_phrase)-1);
                         strcpy(number, operand_phrase+1);
                         ascii_number = string_to_number_conv(number);
-                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number), ascii_number);
+                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
                         binary_src_operand_code = malloc(BINARY_TWOS);
                         strcpy(binary_src_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+source_operand_idx_jumping_sort, "00", REGISTER_SORTING);
@@ -726,7 +731,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         number = malloc(strlen(operand_phrase)-1);
                         strcpy(number, operand_phrase+1);
                         ascii_number = int_to_ascii(string_to_number_conv(number));
-                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number), ascii_number);
+                        ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
                         binary_dest_operand_code = malloc(BINARY_TWOS);
                         strcpy(binary_dest_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+dest_operand_idx_jumping_sort, "00", REGISTER_SORTING);
@@ -932,5 +937,67 @@ void free_binary_list(){
     while(binary_head != NULL){
         free(binary_head);
         binary_head = binary_head->next;
+    }
+}
+
+void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line){
+    int number = 0;
+    int op_code = 15;
+    char *number_in_binary;
+    printf("operand_phrase debug %s\n", operand_phrase);
+    operand_phrase = strtok(operand_phrase, ", \n");
+    while(operand_phrase != NULL){
+        if(allocate_memory_for_binary_code() == 0){
+            current_binary->line =line;
+            current_binary->decimal_adress = decimal_adress;
+            number = string_to_number_conv(operand_phrase);
+            number_in_binary = compliment_two_binary(int_to_binary(number, op_code), number);
+            memcpy(current_binary->binary_code, number_in_binary, BINARY_TWOS + 2);
+            printf("current _ binary:  %s\n", current_binary->binary_code);
+            printf("test binary: %s\n", number_in_binary);
+        }
+        insert_new_binary();
+        decimal_adress++;
+        operand_phrase = strtok(NULL, ", \n");
+    }
+}
+
+void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int line){
+    int number = 0;
+    char *number_in_binary;
+    char *temp_string;
+    char char_string;
+    int ascii_number = 0;
+    char *binary_num;
+    int is_quote = 0;
+    int op_code = 16;
+
+    temp_string = malloc(strlen(operand_phrase)+1);
+    strcpy(temp_string,operand_phrase);
+
+    for (char_string = *temp_string; char_string != '\0'; char_string = *++temp_string) {
+        if(char_string == '"') {
+            is_quote++;
+        }
+        else if ((char_string == ' ') && (is_quote == 0 || is_quote == 2)){
+            continue;
+        }
+        else {
+            if(allocate_memory_for_binary_code() == 0){
+                current_binary->line = line;
+                current_binary->decimal_adress = decimal_adress;
+                ascii_number = calc_ascii_in_string(char_string);
+                binary_num = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
+                memcpy(current_binary->binary_code, binary_num, BINARY_TWOS+2);
+                insert_new_binary();
+                decimal_adress ++;
+            }
+        }
+    }
+    if(allocate_memory_for_binary_code() == 0){
+        current_binary->line = line;
+        current_binary->decimal_adress = decimal_adress;
+        memcpy(current_binary->binary_code, "00000000000000", BINARY_TWOS+2);
+        insert_new_binary();
     }
 }

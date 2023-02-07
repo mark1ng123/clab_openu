@@ -5,7 +5,9 @@
 
 /*TODO:
  * 1.   .ent, .ext
- * 5.   .string .data binary
+ * 2. Add documentation to new functions.
+ * 3. Open new branch for QA, optimizing and more readable code.
+ * 4. Start phase 2.
  */
 
 int first_parse(char* file_name) {
@@ -251,9 +253,12 @@ int first_parse(char* file_name) {
                                 case 0:
                                     printf("data_instraction: %s\n", word_parse);
                                     word_parse = strtok(NULL, "\n");
+                                    operand_phrase = malloc(sizeof(word_parse));
+                                    strcpy(operand_phrase, word_parse);
                                     printf("current_word: %s\n", word_parse);
                                     if(is_valid_data_instruct(word_parse, line_counter) == 0){
-                                    word_parse = strtok(word_parse, ", \n");
+                                        word_parse = strtok(word_parse, ", \n");
+                                        printf("operand_phrase: %s\n", word_parse);
                                         while(word_parse != NULL){
                                             printf("Word: %s\n", word_parse);
                                             printf("ascii: %d\n", (string_to_number_conv(word_parse)));
@@ -261,6 +266,8 @@ int first_parse(char* file_name) {
                                             word_counter ++;
                                         }
                                     }
+                                    printf("test\n");
+                                    binary_encoding_for_data(decimal_adress, operand_phrase, line_counter);
                                     decimal_adress += word_counter;
                                     word_counter = 0;
                                     break;
@@ -268,8 +275,9 @@ int first_parse(char* file_name) {
                                 case 1:
                                     printf("data_instraction: %s\n", word_parse);
                                     word_parse = strtok(NULL, "\n");
+                                    operand_phrase = malloc(sizeof(word_parse));
+                                    strcpy(operand_phrase, word_parse);
                                     printf("current_word: %s\n", word_parse);
-
                                     if(is_valid_string(word_parse, line_counter) == 0){
                                         temp_string = malloc(strlen(word_parse)+1);
                                         strcpy(temp_string,word_parse);
@@ -289,6 +297,7 @@ int first_parse(char* file_name) {
                                         word_counter ++; /*need to add null pointer*/
 
                                     }
+                                    binary_encoding_for_string(decimal_adress, operand_phrase, line_counter);
                                     decimal_adress += word_counter;
                                     word_counter = 0;
                                     is_qoute = 0;
@@ -473,20 +482,25 @@ int first_parse(char* file_name) {
                         /* .data */
                         case 0:
                             printf("data_instraction: %s\n", word_parse);
-                                word_parse = strtok(NULL, "\n");
-                                printf("current_word: %s\n", word_parse);
-                                if(is_valid_data_instruct(word_parse, line_counter) == 0){
+                            word_parse = strtok(NULL, "\n");
+                            printf("current_word: %s\n", word_parse);
+                            if(is_valid_data_instruct(word_parse, line_counter) == 0){
                                 word_parse = strtok(word_parse, ", \n");
-                                    while(word_parse != NULL){
-                                        printf("Word: %s\n", word_parse);
-                                        printf("ascii: %d\n", (string_to_number_conv(word_parse)));
-                                        word_parse = strtok(NULL, ", \n");
-                                        word_counter ++;
-                                    }
+                                operand_phrase = malloc(sizeof(word_parse));
+                                strcpy(operand_phrase, word_parse);
+                                printf("operand_phrase: %s\n", word_parse);
+                                while(word_parse != NULL){
+                                    printf("Word: %s\n", word_parse);
+                                    printf("ascii: %d\n", (string_to_number_conv(word_parse)));
+                                    word_parse = strtok(NULL, ", \n");
+                                    word_counter ++;
                                 }
-                                decimal_adress += word_counter;
-                                word_counter = 0;
-                                break;
+                            }
+                            printf("test\n");
+                            binary_encoding_for_data(decimal_adress, operand_phrase, line_counter);
+                            decimal_adress += word_counter;
+                            word_counter = 0;
+                            break;
                         /* .string */
                         case 1:
                             printf("data_instraction: %s\n", word_parse);

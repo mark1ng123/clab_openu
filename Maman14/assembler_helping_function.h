@@ -221,8 +221,13 @@ void insert_new_binary();
 
 int int_to_ascii(int number);
 
-char* int_to_binary(int number);
+char* int_to_binary(int number, int op_code);
 
 char* compliment_two_binary(char* binary_number, int number);
+
+void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line);
+
+void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int line);
+
 
 #endif
