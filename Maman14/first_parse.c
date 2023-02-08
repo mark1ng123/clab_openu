@@ -5,8 +5,6 @@
 
 /*TODO:
  * 1.   .ent, .ext
- * 2. Add documentation to new functions.
- * 3. Open new branch for QA, optimizing and more readable code.
  * 4. Start phase 2.
  */
 
