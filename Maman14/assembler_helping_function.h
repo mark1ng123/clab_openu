@@ -209,22 +209,81 @@ void print_symbols();
  */
 void free_symbols();
 
+/*
+ * binary_encoding method:
+ * Will receive a line and convert the line to binary according to the instructions given in the project.
+ * Input:
+ * 1.op_code -> the operation code used in the line.
+ * 2.decimal_adress -> the decimal adress of the line given.
+ * 3.operand_phrase -> the operands phrase coming after the op code used.
+ * 4.number_of_registers -> the number of registers given in the operand phrase.
+ * 5.line-> debuging reasons needs to be removed later <<<<<<<<<<<<<
+ */
 void binary_encoding(int op_code, int decimal_adress, char *operand_phrase, int number_of_registers, int line);
 
+/*
+ * allocate_memory_for_binary_code method:
+ * Does excatly what it says, allocates memory for a new line of binary code.
+ * Output:
+ * 1. return -1 if it wasnt able to allocate memory.
+ * 2. return 0 if allocation worked.
+ */
 int allocate_memory_for_binary_code();
 
+/*
+ * print_binary_list method:
+ * prints the binary list we saved.
+ */
 void print_binary_list();
 
+/*
+ * free_binary_list method:
+ * frees the memory of the binary list.
+ */
 void free_binary_list();
 
+/*
+ * insert_new_binary method:
+ * inserts a new binary line of code to the binary list we have.
+ */
 void insert_new_binary();
 
+/*
+ * int_to_ascii method:
+ * receives an interger and converts the integer to ascii.
+ * Input:
+ * 1.number-> the number we want to convert to ascii.
+ * Output:
+ * 1.the number in ascii code.
+ */
 int int_to_ascii(int number);
 
+/*
+ * int_to_binary method:
+ * receives an integer and converts it to 1's compliment binary.
+ * Input:
+ * 1. number -> the number we want to convert to binary.
+ * 2. op_code -> the operation code used to prvoke binary encoding.
+ * Output:
+ * returns a string of X bits representing a binary number, X changes due to the op code given to the function.
+ */
 char* int_to_binary(int number, int op_code);
 
+/*
+ * compliment_two_binary method:
+ * receives a char pointer which points to a compliment 1's binary number and an integer which represented in binary.
+ * and converts it to 2's compliment binary.
+ * Input:
+ * 1. binary_number -> the char pointer that points to the 1's binary number.
+ * 2. number -> the number we represented in binary.
+ * Output:
+ * returns a string of X bits representing a 2's compliment binary number, X changes due to the op code given to the function.
+ */
 char* compliment_two_binary(char* binary_number, int number);
 
+/*
+ * Both of the methods below does the same as binary encoding with different rules.
+ */
 void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line);
 
 void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int line);

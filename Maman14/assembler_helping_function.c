@@ -551,6 +551,7 @@ int allocate_memory_for_binary_code(){
     for(; current_digit<WORD_SIZE; current_digit++){
         current_binary->binary_code[current_digit] = '0';
     }
+    /* Struct size is bigger then binary code size which is hard coded that why we delocate memory from the 14 bit*/
     current_binary->binary_code[WORD_SIZE] = '\0';
     return 0;
 }
@@ -562,6 +563,7 @@ char* int_to_binary(int number, int op_code){
     int left = 0;
     int right = 0;
     char temp;
+    /* Size depends on the op_code used */
     if(op_code < 15){
         reversed_binary_number = malloc(BINARY_TWOS);
         right = BINARY_TWOS;
@@ -580,6 +582,7 @@ char* int_to_binary(int number, int op_code){
         reversed_binary_number[char_idx] = abs(new_number) + '0';
         number = number/2;
     }
+    /* Reversing from right to left -> left to right */
     right = right - 1;
     while(left < right){
         temp = reversed_binary_number[right];
@@ -594,10 +597,11 @@ char* int_to_binary(int number, int op_code){
 char* compliment_two_binary(char* binary_number, int number){
     int char_idx = 0;
     int secondery_idx = 0;
-    int carry = 1;
+    /* if number is positive we dont need to do anything*/
     if(number > 0){
         return binary_number;
     }else{
+        /* Initialize */
         for(char_idx = strlen(binary_number)-1; char_idx >= 0; char_idx--){
             if(binary_number[char_idx]=='1')
                 break;
@@ -606,6 +610,7 @@ char* compliment_two_binary(char* binary_number, int number){
             binary_number[strlen(binary_number)-1] = '1';
             return binary_number;
         }
+        /* Saved char idx from 1st iteration to make it more effecient */
         for(secondery_idx = char_idx-1; secondery_idx>=0; secondery_idx--){
             if(binary_number[secondery_idx] == '1'){
                 binary_number[secondery_idx] = '0';
@@ -620,42 +625,45 @@ char* compliment_two_binary(char* binary_number, int number){
 
 
 void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int number_of_registers, int line){
+    /*Indexing declarations */
     int op_code_index_start = 4;
-    int number_of_operand = 0;
     int dest_operand_start_idx = 10;
     int source_operand_start_idx = 8;
     int source_operand_solo_line = 0;
+    int dest_operand_solo_line = 6;
     int dest_operand_idx_jumping_sort = 2;
     int source_operand_idx_jumping_sort = 0;
-    int dest_operand_solo_line = 6;
-    int solo_operand = 0;
     int register_index = 0;
+    /* Flag declarations */
+    int number_of_operand = 0;
+    int solo_operand = 0;
     int total_lines_needed = 0;
     char *number;
     int src_number = 0;
     int dest_number = 0;
     int ascii_number;
     char *ascii_in_binary;
+    /* Setting the base for input of the two operands */
     char *binary_src_operand_code = malloc(OPERANDS_OFFSET);
     char *binary_dest_operand_code = malloc(OPERANDS_OFFSET);
-    current_binary = malloc(sizeof (struct BinaryList));
-    printf("operation code: %d\n", op_code);
+    printf("operation code:  %d\n", op_code);
     /* Insert new binary */
     if(allocate_memory_for_binary_code() == 0){
+        /* Setting known vars */
         current_binary->line = line;
         current_binary->decimal_adress = decimal_adress;
         memcpy(current_binary->binary_code + op_code_index_start, binary_op_code_array[op_code], BINARY_OP_CODE);
-        if(op_code != 9 && op_code != 10 && op_code !=13){
+        if(op_code != 9 && op_code != 10 && op_code !=13){ /* Parsing by op_code */
             operand_phrase = strtok(operand_phrase, "\n, ");
             while(operand_phrase!=NULL) {
                 number_of_operand++;
                 if (check_if_word_is_register(operand_phrase) != -1) {
                     register_index = check_if_word_is_register(operand_phrase);
-                    /* Source operand */
+                    /* Source register operand */
                     if(number_of_operand == 1){
                         strcpy(binary_src_operand_code, binary_register_code_array[register_index]);
                         memcpy(current_binary->binary_code+source_operand_start_idx, "11", REGISTER_SORTING);
-                    }else{  /* Dest operand */
+                    }else{  /* Dest register operand */
                         strcpy(binary_dest_operand_code, binary_register_code_array[register_index]);
                         memcpy(current_binary->binary_code+dest_operand_start_idx, "11", REGISTER_SORTING);
                     }
@@ -685,11 +693,11 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                     }
                 }
                 else{
-                    /* Source */
+                    /* Source label operand */
                     if(number_of_operand == 1 && op_code < 14){
                         memcpy(current_binary->binary_code+source_operand_start_idx, "01", REGISTER_SORTING);
                         binary_src_operand_code = NULL;
-                    }else{  /* Dest operand */
+                    }else{  /* Dest label operand */
                         memcpy(current_binary->binary_code+dest_operand_start_idx, "01", REGISTER_SORTING);
                         binary_dest_operand_code = NULL;
                     }
@@ -697,18 +705,18 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 operand_phrase = strtok(NULL, "\n, ");
             }
         }else {
-            /* Insert Jumping sort */
+            /* Insert Jumping sort every 1st operand we skip we know its a label and will be treated as it needs */
             operand_phrase = strtok(operand_phrase, "(, ");
             while (operand_phrase != NULL) {
                 printf("operand_phrase : %s\n", operand_phrase);
                 number_of_operand++;
                 if (check_if_word_is_register(operand_phrase) != -1) {
                     register_index = check_if_word_is_register(operand_phrase);
-                    /* Source operand */
+                    /* Source register operand */
                     if(number_of_operand == 2){
                         strcpy(binary_src_operand_code, binary_register_code_array[register_index]);
                         memcpy(current_binary->binary_code+source_operand_idx_jumping_sort, "11", REGISTER_SORTING);
-                    }else if (number_of_operand == 3){/* Dest operand */
+                    }else if (number_of_operand == 3){/* Dest register operand */
                         strcpy(binary_dest_operand_code, binary_register_code_array[register_index]);
                         memcpy(current_binary->binary_code+dest_operand_idx_jumping_sort, "11", REGISTER_SORTING);
                     }else{
@@ -742,13 +750,13 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                     }
                 }
                 else{
-                    /* Source */
+                    /* Source label operand */
                     if(number_of_operand == 2){
                         memcpy(current_binary->binary_code+source_operand_idx_jumping_sort, "01", REGISTER_SORTING);
                         if(binary_src_operand_code != NULL){
                             binary_src_operand_code = NULL;
                         }
-                    }else if(number_of_operand == 3){  /* Dest operand */
+                    }else if(number_of_operand == 3){  /* Dest label operand */
                         memcpy(current_binary->binary_code+dest_operand_idx_jumping_sort, "01", REGISTER_SORTING);
                         if(binary_dest_operand_code != NULL){
                             binary_dest_operand_code = NULL;
@@ -762,7 +770,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 operand_phrase = strtok(NULL, ",) \n");
             }
         }
-        printf("testing \n");
+        /*Checking how many lines of binary we need */
         if(number_of_operand == 1){
             if(op_code < 14){
                 solo_operand = 1;
@@ -782,9 +790,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
         }else if(number_of_operand == 3){
             memcpy(current_binary->binary_code + 8, "0010", 4);
         }
-        printf("number of operands : %d\n", number_of_operand);
-        printf("current : %s\n", current_binary->binary_code);
-        /* Add to binary list */
+        /* Add to first line of binary to the list */
         insert_new_binary();
         /* Need only one line of binary*/
         if((number_of_registers == 2 || op_code>=14) && op_code != 10 && op_code !=9 && op_code != 13){
@@ -803,7 +809,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 total_lines_needed = 2;
             }
         }
-        printf("print test number of lines %d\n", total_lines_needed);
+        /* Inserting operand lines of binary indexing works backwards, beacuse we count from the X operands to 0*/
         while(number_of_operand!=0){
             if(total_lines_needed == 2 && op_code != 9 && op_code !=10 && op_code != 13){
                 if(allocate_memory_for_binary_code() == 0) {
@@ -963,8 +969,6 @@ void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line
 }
 
 void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int line){
-    int number = 0;
-    char *number_in_binary;
     char *temp_string;
     char char_string;
     int ascii_number = 0;

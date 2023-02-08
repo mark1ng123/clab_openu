@@ -23,6 +23,11 @@ struct Symbol{
     struct Symbol *next;
 };
 
+/*
+ * The BinaryList structure,
+ * Every time we have a valid line we want to encode her to binary machine code, the binary code represent in 14 bits,
+ * decimal adress its the decimal adress of the binary line, next is the next binary line.
+ */
 struct BinaryList{
     char binary_code[WORD_SIZE];
     int decimal_adress;

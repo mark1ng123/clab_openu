@@ -1,7 +1,7 @@
 #ifndef GLOBAL_OPERATIONS_H
 #define GLOBAL_OPERATIONS_H
 
-/* Globals for input checking and parsing */
+/* Globals for input checking,parsing and binary encoding */
 char *valid_opcode[] = {"mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec","jmp", "bne", "red", "prn",
                               "jsr", "rts", "stop"};
 char *data_instruction[] = {".data", ".string"};
