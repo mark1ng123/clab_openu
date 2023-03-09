@@ -5,7 +5,6 @@
 
 /*TODO:
  * 1.   .ent, .ext
- * 4. Start phase 2.
  */
 
 int first_parse(char* file_name) {
@@ -27,7 +26,6 @@ int first_parse(char* file_name) {
     int data_instruction_code;
     int word_is_register = 0;
     int line_counter = 1;
-    int is_error = 0;
 
 
     /* Errors: */
@@ -71,7 +69,6 @@ int first_parse(char* file_name) {
         if(is_skip_line(potential_symbol_name) == 0){
             continue; /* do we */
         }
-
         /* Expression for finding a symbol: */
         else if(check_is_line_starting_with_symbol(potential_symbol_name) == 0){
             if(check_valid_symbol_name(potential_symbol_name, line_counter) == 0){
@@ -170,7 +167,7 @@ int first_parse(char* file_name) {
                                             word_counter++;
                                         }
                                         printf("\n word_parse is: %s \n" , word_parse);
-                                        word_parse = strtok(NULL, "\n, ");
+                                        strtok(NULL, "\n, ");
                                         if(word_is_register + word_counter != 2){
                                             error_def = "Invalid number of params";
                                             register_new_error(line_counter, error_def);
@@ -403,7 +400,7 @@ int first_parse(char* file_name) {
                                         word_counter++;
                                     }
                                     printf("\n word_parse is: %s \n" , word_parse);
-                                    word_parse = strtok(NULL, "\n, ");
+                                    strtok(NULL, "\n, ");
                                     if(word_is_register + word_counter != 2){
                                         error_def = "Invalid number of params";
                                         register_new_error(line_counter, error_def);

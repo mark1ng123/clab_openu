@@ -567,6 +567,11 @@ char* int_to_binary(int number, int op_code){
     if(op_code < 15){
         reversed_binary_number = malloc(BINARY_TWOS);
         right = BINARY_TWOS;
+    }else if(op_code == 20){ /*i added this*/
+        reversed_binary_number = malloc(BINARY_TWOS + 2);
+        right = BINARY_TWOS;
+        reversed_binary_number[13] = '0';
+        reversed_binary_number[12] = '1';
     }else{
         reversed_binary_number = malloc(BINARY_TWOS + 2);
         right = BINARY_TWOS + 2;
@@ -676,7 +681,8 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         strcpy(number, operand_phrase+1);
                         ascii_number = string_to_number_conv(number);
                         ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
-                        binary_src_operand_code = malloc(BINARY_TWOS);
+                        printf("what is this shit  %s\n", ascii_in_binary);
+                        binary_src_operand_code = malloc(BINARY_TWOS+2);/*i added this*/
                         strcpy(binary_src_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+source_operand_start_idx, "00", REGISTER_SORTING);
                         printf("Current binary hello  %s\n", current_binary->binary_code);
@@ -686,7 +692,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         strcpy(number, operand_phrase+1);
                         ascii_number = int_to_ascii(string_to_number_conv(number));
                         ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
-                        binary_dest_operand_code = malloc(BINARY_TWOS);
+                        binary_dest_operand_code = malloc(BINARY_TWOS);/*i added this? should we add +2 here also?*/
                         strcpy(binary_dest_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+dest_operand_start_idx, "00", REGISTER_SORTING);
                         dest_number++;
@@ -706,6 +712,7 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
             }
         }else {
             /* Insert Jumping sort every 1st operand we skip we know its a label and will be treated as it needs */
+
             operand_phrase = strtok(operand_phrase, "(, ");
             while (operand_phrase != NULL) {
                 printf("operand_phrase : %s\n", operand_phrase);
@@ -1004,4 +1011,104 @@ void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int li
         memcpy(current_binary->binary_code, "00000000000000", BINARY_TWOS+2);
         insert_new_binary();
     }
+}
+
+/*i added this*/
+void potential_symbol_to_binary(char* potential_symbol_name, int line_counter){
+    int is_symbol;
+    char *error_def;
+    struct Symbol *temp = NULL;
+    temp = symbol_head;
+    is_symbol = check_if_in_symbol_table(potential_symbol_name);
+
+    if(check_if_potential_symbol_name(potential_symbol_name) != -1){
+            if(is_symbol != 0){
+               write_symbol_binary(int_to_binary(is_symbol,20));/*need to change 20 to something with meaning*/
+            }
+            else{
+                write_symbol_binary("**************");
+                error_def = "Unidentified symbol";
+                register_new_error(line_counter, error_def);
+            }
+        }
+    symbol_head = temp;
+}
+
+int check_if_in_symbol_table(char* potential_symbol_name){
+    while(symbol_head != NULL){
+        if(strcmp(symbol_head->name, potential_symbol_name) == 0){
+            return symbol_head->decimal_adress;
+        }
+        symbol_head = symbol_head->next;
+    }
+    return 0;
+}
+
+void write_symbol_binary(char* decimal_address){
+    struct BinaryList *temp_binary = NULL;
+    temp_binary = binary_head;
+    while(binary_head != NULL) {
+       if(strcmp(binary_head->binary_code, "??????????????") == 0){
+            memcpy(binary_head->binary_code,decimal_address,BINARY_TWOS + 2);/*14*/
+            break;
+       }
+       binary_head = binary_head->next;
+    }
+    binary_head = temp_binary;
+
+}
+
+void clean_potential_symbol_to_binray(){
+    struct Symbol *temp = NULL;
+    temp = symbol_head;
+    while(symbol_head != NULL){
+        symbol_head->name[strlen(symbol_head->name)-1] = '\0';
+        symbol_head = symbol_head->next;
+    }
+    symbol_head = temp;
+}
+
+int check_if_potential_symbol_name(char *potential_symbol){
+    int char_idx = 1;
+
+    if (check_if_word_is_op(potential_symbol) != -1 || check_if_word_is_data_instruction(potential_symbol) != -1
+        || check_if_word_is_register(potential_symbol) != -1 || check_if_word_entry_extern_instruction(potential_symbol) != -1){
+            return -1;
+        }
+    if(isalpha(potential_symbol[0]) == 0){
+        return -1;
+    }
+    for (; char_idx < strlen(potential_symbol)-1; char_idx++) {
+        if (isdigit(potential_symbol[char_idx]) == 0 && isalpha(potential_symbol[char_idx]) == 0) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+int create_object_file(char* file_name){
+    char *only_file_name;
+    struct BinaryList *temp = NULL;
+    FILE *ob_file;
+    temp = binary_head;
+
+    only_file_name = strtok(file_name, FILE_DELIMITER);
+    ob_file = fopen(strcat(only_file_name, ".ob"), "w");
+
+    /*error in opening file*/
+    if(ob_file == NULL) {
+        printf("Error opening file\n");
+        return -1;
+    }
+    printf("Creating a object file: %s\n", only_file_name);
+    /*printing binary_list data into .ob file*/
+    while(binary_head != NULL){
+        fprintf(ob_file,"%s\n",binary_head->binary_code);
+        binary_head = binary_head->next;
+    }
+    binary_head = temp;
+
+    free_binary_list();
+    fclose(ob_file);
+    return 0;
 }

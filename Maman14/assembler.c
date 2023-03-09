@@ -14,6 +14,8 @@
 #include "check_input_files.h"
 #include "pre_assembler.h"
 #include "first_parse.h"
+#include "second_parse.h"
+#include "assembler_helping_function.h"
 
 /* TODO: Add doc when finished each step.*/
 /*
@@ -57,6 +59,13 @@ int main(int argc, char **argv){
         }
 
         if(first_parse(file_name) == -1){
+            return -1;
+        }
+
+        if(second_parse(file_name) == -1){
+            return -1;
+        }
+        if(create_object_file(file_name) == -1){
             return -1;
         }
         /* TODO: add next stages when done */
