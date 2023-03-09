@@ -3,10 +3,6 @@
 #include "assembler_helping_function.h"
 #include "error_handeling.h"
 
-/*TODO:
- * 1.   .ent, .ext
- */
-
 int first_parse(char* file_name) {
     /* File declarations: */
     char *only_file_name = strtok(file_name, FILE_DELIMITER);
@@ -24,6 +20,7 @@ int first_parse(char* file_name) {
     int is_qoute = 0;
     int op_code;
     int data_instruction_code;
+    int entry_or_extern;
     int word_is_register = 0;
     int line_counter = 1;
 
@@ -300,11 +297,7 @@ int first_parse(char* file_name) {
 
                             }
                             DC++;
-                        }
-                        else if(check_if_word_entry_extern_instruction(word_parse)!=-1){
-                            printf("ext_or_ent: %s\n", word_parse);
-                        }
-                        else{
+                        }else{
                             error_def = "Invalid syntax";
                             register_new_error(line_counter, error_def);
                             break;
@@ -531,6 +524,33 @@ int first_parse(char* file_name) {
                 }
                 else if(check_if_word_entry_extern_instruction(word_parse)!=-1){
                     printf("ext_or_ent: %s\n", word_parse);
+                    entry_or_extern = check_if_word_entry_extern_instruction(word_parse);
+                    switch(entry_or_extern){
+                        /* extern */
+                        case 0:
+                            word_parse = strtok(NULL, "\n");
+                            if(check_if_potential_symbol_name(word_parse) != -1){
+                                if(allocate_memory_for_extern() == 0){
+                                    insert_new_extern(line_counter, word_parse);
+                                }
+                            }else{
+                                error_def = "Invalid syntax";
+                                register_new_error(line_counter, error_def);
+                            }
+                            break;
+                        /* entry */
+                        case 1:
+                            word_parse = strtok(NULL, "\n");
+                            if(check_if_potential_symbol_name(word_parse) != -1){
+                                if(allocate_memory_for_entry() == 0){
+                                    insert_new_entry(line_counter, word_parse);
+                                }
+                            }else{
+                                error_def = "Invalid syntax";
+                                register_new_error(line_counter, error_def);
+                            }
+                            break;
+                    }
                 }
                 else{
                     error_def = "Invalid syntax";
@@ -555,9 +575,10 @@ int first_parse(char* file_name) {
     free(reading_line);
     is_error = return_is_error();
     if(is_error == 1){
-        print_and_free_error();
         free_symbols();
         free_binary_list();
+        free_entry_list();
+        free_extern_list();
         fclose(am_file);
         return is_error;
     }

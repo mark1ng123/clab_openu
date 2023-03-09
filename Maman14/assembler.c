@@ -16,8 +16,8 @@
 #include "first_parse.h"
 #include "second_parse.h"
 #include "assembler_helping_function.h"
+#include "error_handeling.h"
 
-/* TODO: Add doc when finished each step.*/
 /*
  * Main function:
  * Receiving the user input and navigating between the different steps the program needs to do.
@@ -58,17 +58,29 @@ int main(int argc, char **argv){
             return -1;
         }
 
-        if(first_parse(file_name) == -1){
-            return -1;
+        if(first_parse(file_name) != 1){
+            if(second_parse(file_name) != 1){
+                if(create_object_file(file_name) == -1){
+                    return -1;
+                }
+                if(create_entry_file(file_name) == -1){
+                    return -1;
+                }
+                if(create_extern_file(file_name) == -1){
+                    return -1;
+                }
+                printf("--------------------------FINISHED--------------------------\n");
+                free_symbols();
+                free_binary_list();
+                free_entry_list();
+                free_extern_list();
+            }else{
+                print_and_free_error();
+            }
+        }else{
+            print_and_free_error();
         }
-
-        if(second_parse(file_name) == -1){
-            return -1;
-        }
-        if(create_object_file(file_name) == -1){
-            return -1;
-        }
-        /* TODO: add next stages when done */
     }
+
     return 0;
 }

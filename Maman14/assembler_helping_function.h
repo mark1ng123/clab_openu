@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "structures.h"
 
 /*
  * check_is_line_starting_with_symbol method:
@@ -343,6 +344,46 @@ void clean_potential_symbol_to_binray();
  */
 int create_object_file(char* file_name);
 
+
+int allocate_memory_for_entry();
+
+int check_entry_in_extern(char *potential_symbol_name);
+
+void insert_new_entry(int line ,char *symbol_name);
+
+void insert_entry(char* symbol_name);
+
+int re_occuring_entry_name(char *potential_symbol_name);
+
+int allocate_memory_for_extern();
+
+void insert_new_extern(int line ,char *symbol_name);
+
+void insert_extern(char* symbol_name);
+
+int check_extern_in_entry(char *potential_symbol_name);
+
+int re_occuring_extern_name(char *potential_symbol_name);
+
+int check_if_in_entry_table(char* potential_symbol_name);
+
+int check_if_in_extern_table(char* potential_symbol_name);
+
+int check_if_extern_using_a_symbol_from_current_file();
+
+void initArray(struct DecimalAdressArray *a, size_t initialSize);
+
+void insertArray(struct DecimalAdressArray *a, int element);
+
+void freeArray(struct DecimalAdressArray *a);
+
+int create_entry_file(char* file_name);
+
+int create_extern_file(char* file_name);
+
+void free_extern_list();
+
+void free_entry_list();
 
 #endif
 

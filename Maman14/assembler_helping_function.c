@@ -15,6 +15,16 @@ struct BinaryList *binary_head = NULL;
 struct BinaryList *binary_tail = NULL;
 struct BinaryList *current_binary = NULL;
 
+/* intialization for saving the Entry instruction */
+struct Entry *entry_head = NULL;
+struct Entry *entry_tail = NULL;
+struct Entry *current_entry = NULL;
+
+/* intialization for saving the Entry instruction */
+struct Extern *extern_head = NULL;
+struct Extern *extern_tail = NULL;
+struct Extern *current_extern = NULL;
+
 
 /* Functions */
 int check_is_line_starting_with_symbol(char *symbol){
@@ -562,17 +572,28 @@ char* int_to_binary(int number, int op_code){
     int new_number = 0;
     int left = 0;
     int right = 0;
+    int char_iterator = 0;
     char temp;
     /* Size depends on the op_code used */
     if(op_code < 15){
         reversed_binary_number = malloc(BINARY_TWOS);
         right = BINARY_TWOS;
-    }else if(op_code == 20){ /*i added this*/
+    }else if(op_code == 20){    /* Second parse */
         reversed_binary_number = malloc(BINARY_TWOS + 2);
         right = BINARY_TWOS;
         reversed_binary_number[13] = '0';
         reversed_binary_number[12] = '1';
-    }else{
+    }else if(op_code == 21){ /* Second parse entry */
+        reversed_binary_number = malloc(BINARY_TWOS + 2);
+        for(;char_iterator < BINARY_TWOS+2; char_iterator++){
+            reversed_binary_number[char_iterator] = '0';
+            if(char_iterator == BINARY_TWOS + 1){
+                reversed_binary_number[char_iterator] = '1';
+            }
+        }
+        return reversed_binary_number;
+    }
+    else{
         reversed_binary_number = malloc(BINARY_TWOS + 2);
         right = BINARY_TWOS + 2;
     }
@@ -824,22 +845,18 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         if(binary_src_operand_code == NULL){
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }else if(src_number == 0 ){
-                            printf("test1\n");
                             printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                             memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
                         }else{
-                            printf("test1\n");
                             printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                             memcpy(current_binary->binary_code, binary_src_operand_code, BINARY_TWOS);
                         }
                     }
                     else{
                         if(binary_dest_operand_code == NULL && op_code < 14){
-                            printf("test2\n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }else{
                             if(solo_operand == 0){
-                                printf("test3\n");
                                 if(dest_number == 0){
                                     memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
                                 }
@@ -873,10 +890,8 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }
                         else if(binary_dest_operand_code == NULL && number_of_operand == 1 && solo_operand == 0){
-                            printf("test2\n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }else if(binary_src_operand_code == NULL && number_of_operand == 2 && solo_operand == 0){
-                            printf("test3\n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }else if(number_of_operand == 2 && solo_operand == 0){
                             if(number_of_registers == 2){
@@ -885,17 +900,14 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                                 memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
                             }
                             if(src_number == 0){
-                                printf("test operand 3\n");
                                 printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
                             }else{
-                                printf("test1\n");
                                 printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code, binary_src_operand_code, BINARY_TWOS);
                             }
                         }else if(number_of_operand == 1 && solo_operand == 0){
                             if(dest_number == 0){
-                                printf("test operand 2\n");
                                 printf("dest:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
                             }else{
@@ -903,7 +915,6 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                                 memcpy(current_binary->binary_code, binary_dest_operand_code, BINARY_TWOS);
                             }
                         }else if(solo_operand == 1){
-                            printf("test solo \n");
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }
                     }
@@ -913,6 +924,8 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 decimal_adress++;
                 total_lines_needed--;
             }else if(total_lines_needed == 2){
+                decimal_adress++;
+            }else if(total_lines_needed == 3){
                 decimal_adress++;
             }
             current_binary->line = line;
@@ -1013,25 +1026,82 @@ void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int li
     }
 }
 
-/*i added this*/
-void potential_symbol_to_binary(char* potential_symbol_name, int line_counter){
-    int is_symbol;
+int check_if_extern_using_a_symbol_from_current_file(){
+    struct Extern *extern_it = NULL;
+    struct Symbol *symbol_it = NULL;
     char *error_def;
-    struct Symbol *temp = NULL;
-    temp = symbol_head;
-    is_symbol = check_if_in_symbol_table(potential_symbol_name);
-
-    if(check_if_potential_symbol_name(potential_symbol_name) != -1){
-            if(is_symbol != 0){
-               write_symbol_binary(int_to_binary(is_symbol,20));/*need to change 20 to something with meaning*/
+    extern_it = extern_head;
+    symbol_it = symbol_head;
+    while(extern_head != NULL){
+        while(symbol_head != NULL){
+            if(strcmp(extern_head->symbol_name, symbol_head->name) == 0){
+                error_def = "extern using symbol name in current file";
+                register_new_error(-1, error_def);
+                return -1;
             }
-            else{
+            symbol_head = symbol_head->next;
+        }
+        symbol_head = symbol_it;
+        extern_head = extern_head->next;
+    }
+    extern_head = extern_it;
+    symbol_head = symbol_it;
+    return 0;
+}
+
+
+void potential_symbol_to_binary(char* potential_symbol_name, int line_counter){
+    int is_symbol, is_entry, is_extern;
+    char *error_def;
+    struct Symbol *symbol_temp = NULL;
+    struct Entry *entry_temp = NULL;
+    struct Extern *extern_temp = NULL;
+    struct BinaryList *list_temp = NULL;
+    list_temp = binary_head;
+    symbol_temp = symbol_head;
+    entry_temp = entry_head;
+    extern_temp = extern_head;
+    is_symbol = check_if_in_symbol_table(potential_symbol_name);
+    is_entry = check_if_in_entry_table(potential_symbol_name);
+    is_extern = check_if_in_extern_table(potential_symbol_name);
+    if(check_if_potential_symbol_name(potential_symbol_name) != -1){
+        if(is_symbol != 0){
+            if(is_entry == 0){
+                    write_symbol_binary(int_to_binary(is_symbol,20));/*need to change 20 to something with meaning*/
+                }else{
+                    if(entry_head->decimal_adress == 0){
+                        entry_head->decimal_adress = is_symbol;
+                        write_symbol_binary(int_to_binary(is_symbol,20));/*need to change 20 to something with meaning*/
+                    }else{
+                        error_def = "Entry symbol was found in more then one place";
+                        register_new_error(line_counter, error_def);
+                    }
+                }
+            }else if(is_extern != 0){
+                if(extern_head->decimal_adress.array == NULL){
+                    printf("intialize array: %s\n", extern_head->symbol_name);
+                    initArray(&extern_head->decimal_adress, 1);
+                }
+                while(binary_head != NULL){
+                    if(strcmp(binary_head->binary_code, "??????????????") == 0){
+                        printf("insert to array: %s, %d\n", extern_head->symbol_name, binary_head->decimal_adress);
+                        insertArray(&extern_head->decimal_adress, binary_head->decimal_adress);
+                        binary_head = list_temp;
+                        write_symbol_binary(int_to_binary(is_symbol,21));
+                        break;
+                    }
+                    binary_head = binary_head->next;
+                }
+        }else{
                 write_symbol_binary("**************");
                 error_def = "Unidentified symbol";
                 register_new_error(line_counter, error_def);
             }
         }
-    symbol_head = temp;
+    symbol_head = symbol_temp;
+    entry_head = entry_temp;
+    extern_head = extern_temp;
+
 }
 
 int check_if_in_symbol_table(char* potential_symbol_name){
@@ -1040,6 +1110,24 @@ int check_if_in_symbol_table(char* potential_symbol_name){
             return symbol_head->decimal_adress;
         }
         symbol_head = symbol_head->next;
+    }
+    return 0;
+}
+int check_if_in_entry_table(char* potential_symbol_name){
+    while(entry_head != NULL){
+        if(strcmp(entry_head->symbol_name, potential_symbol_name) == 0){
+            return 1;
+        }
+        entry_head = entry_head->next;
+    }
+    return 0;
+}
+int check_if_in_extern_table(char* potential_symbol_name){
+    while(extern_head != NULL){
+        if(strcmp(extern_head->symbol_name, potential_symbol_name) == 0){
+            return 1;
+        }
+        extern_head = extern_head->next;
     }
     return 0;
 }
@@ -1086,9 +1174,152 @@ int check_if_potential_symbol_name(char *potential_symbol){
     return 0;
 }
 
+int allocate_memory_for_entry(){
+    current_entry = malloc(sizeof(struct Symbol));
+    if(current_entry == NULL){
+        printf("Unable to allocate memory for current_entry\n");
+        return -1;
+    }
+    return 0;
+}
+
+void insert_new_entry(int line ,char *symbol_name){
+    char *error_def;
+    if(check_entry_in_extern(symbol_name) != 1) {
+        if(re_occuring_entry_name(symbol_name) == 1){
+            error_def = "Reoccurring entry name";
+            register_new_error(line, error_def);
+        }else{
+            insert_entry(symbol_name);
+        }
+    }else{
+        error_def = "Entry was found in extern";
+        register_new_error(line, error_def);
+    }
+}
+
+void insert_entry(char* symbol_name){
+    current_entry->symbol_name = malloc(sizeof(symbol_name));
+    strcpy(current_entry->symbol_name, symbol_name);
+    current_entry->next = NULL;
+    current_entry->decimal_adress = 0;
+    /* Linked list setters */
+    if (entry_head == NULL) {
+        entry_head = current_entry;
+        entry_tail = current_entry;
+    } else {
+        entry_tail->next = current_entry;
+        entry_tail = current_entry;
+        entry_tail->next = NULL;
+    }
+}
+
+
+int re_occuring_entry_name(char *potential_symbol_name){
+    struct Entry *it = NULL;
+    it = entry_head;
+    while(entry_head != NULL){
+        printf("CHECKING CHECKING %s\n",entry_head->symbol_name );
+        if(strcmp(entry_head->symbol_name, potential_symbol_name) == 0){
+            entry_head = it;
+            return 1;
+        }
+        entry_head = entry_head->next;
+    }
+    entry_head = it;
+    return 0;
+}
+
+int check_entry_in_extern(char *potential_symbol_name){
+    struct Extern *it = NULL;
+    it = extern_head;
+    while(extern_head != NULL){
+        printf("Checking checking checking  : %s \n", extern_head->symbol_name);
+        if(strcmp(extern_head->symbol_name, potential_symbol_name) == 0){
+            extern_head = it;
+            extern_head = it;
+            return 1;
+        }
+        extern_head = extern_head->next;
+    }
+    extern_head = it;
+    return 0;
+}
+
+int allocate_memory_for_extern(){
+    current_extern = malloc(sizeof(struct Extern));
+    if(current_extern == NULL){
+        printf("Unable to allocate memory for current_entry\n");
+        return -1;
+    }
+    current_extern->decimal_adress.array = NULL;
+    return 0;
+}
+
+void insert_new_extern(int line ,char *symbol_name){
+    char *error_def;
+    if(check_extern_in_entry(symbol_name) != 1) {
+        if(re_occuring_extern_name(symbol_name) == 1){
+            error_def = "Reoccurring extern name";
+            register_new_error(line, error_def);
+        }else{
+            insert_extern(symbol_name);
+        }
+    }else{
+        error_def = "Extern was found in entry";
+        register_new_error(line, error_def);
+    }
+}
+
+void insert_extern(char* symbol_name){
+    current_extern->symbol_name = malloc(sizeof(symbol_name));
+    strcpy(current_extern->symbol_name, symbol_name);
+    current_extern->next = NULL;
+    /* Linked list setters */
+    if (extern_head == NULL) {
+        extern_head = current_extern;
+        extern_tail = current_extern;
+    } else {
+        extern_tail->next = current_extern;
+        extern_tail = current_extern;
+        extern_tail->next = NULL;
+    }
+}
+
+
+int re_occuring_extern_name(char *potential_symbol_name){
+    struct Extern *it = NULL;
+    it = extern_head;
+    while(extern_head != NULL){
+        if(strcmp(extern_head->symbol_name, potential_symbol_name) == 0){
+            extern_head = it;
+            return 1;
+        }
+        extern_head = extern_head->next;
+    }
+    extern_head = it;
+    return 0;
+}
+
+int check_extern_in_entry(char *potential_symbol_name){
+    struct Entry *it = NULL;
+    it = entry_head;
+    while(entry_head != NULL){
+        printf("Checking checking checking  : %s \n", entry_head->symbol_name);
+        if(strcmp(entry_head->symbol_name, potential_symbol_name) == 0){
+            entry_head = it;
+            return 1;
+        }
+        entry_head = entry_head->next;
+    }
+    entry_head = it;
+    return 0;
+}
+
 int create_object_file(char* file_name){
     char *only_file_name;
     struct BinaryList *temp = NULL;
+    int char_idx = 0;
     FILE *ob_file;
     temp = binary_head;
 
@@ -1103,6 +1334,13 @@ int create_object_file(char* file_name){
     printf("Creating a object file: %s\n", only_file_name);
     /*printing binary_list data into .ob file*/
     while(binary_head != NULL){
+        for(; char_idx < sizeof(binary_head->binary_code); char_idx++){
+            if(binary_head->binary_code[char_idx] == '1')
+                binary_head->binary_code[char_idx] = '/';
+            else
+                binary_head->binary_code[char_idx] = '.';
+        }
+        char_idx = 0;
         fprintf(ob_file,"%s\n",binary_head->binary_code);
         binary_head = binary_head->next;
     }
@@ -1111,4 +1349,102 @@ int create_object_file(char* file_name){
     free_binary_list();
     fclose(ob_file);
     return 0;
+}
+
+
+int create_entry_file(char* file_name){
+    char *only_file_name;
+    struct Entry *temp = NULL;
+    FILE *ent_file;
+    temp = entry_head;
+
+    only_file_name = strtok(file_name, FILE_DELIMITER);
+    ent_file = fopen(strcat(only_file_name, ".ent"), "w");
+
+    /*error in opening file*/
+    if(ent_file == NULL) {
+        printf("Error opening file\n");
+        return -1;
+    }
+    printf("Creating an entry file: %s\n", only_file_name);
+    /*printing binary_list data into .ob file*/
+    while(entry_head != NULL){
+        if(entry_head->decimal_adress!=0)
+            fprintf(ent_file,"%s %d\n",entry_head->symbol_name, entry_head->decimal_adress);
+        entry_head = entry_head->next;
+    }
+    entry_head = temp;
+
+    fclose(ent_file);
+    return 0;
+}
+
+int create_extern_file(char* file_name){
+    char *only_file_name;
+    struct Extern *temp = NULL;
+    int adress_idx = 0;
+    FILE *ext_file;
+    temp = extern_head;
+
+    only_file_name = strtok(file_name, FILE_DELIMITER);
+    ext_file = fopen(strcat(only_file_name, ".ext"), "w");
+
+    /*error in opening file*/
+    if(ext_file == NULL) {
+        printf("Error opening file\n");
+        return -1;
+    }
+    printf("Creating an external file: %s\n", only_file_name);
+    /*printing binary_list data into .ob file*/
+    while(extern_head != NULL){
+        for(;adress_idx < extern_head->decimal_adress.size; adress_idx++){
+            if(extern_head->decimal_adress.array[adress_idx] != 0)
+                fprintf(ext_file,"%s %d\n",extern_head->symbol_name, extern_head->decimal_adress.array[adress_idx]);
+        }
+        extern_head = extern_head->next;
+        adress_idx = 0;
+    }
+    extern_head = temp;
+
+    fclose(ext_file);
+    return 0;
+}
+
+
+void initArray(struct DecimalAdressArray *a, size_t initialSize) {
+    a->array = malloc(initialSize * sizeof(int));
+    a->used = 0;
+    a->size = initialSize;
+}
+
+void insertArray(struct DecimalAdressArray *a, int element) {
+    if (a->used == a->size) {
+        a->size *= 2;
+        a->array = realloc(a->array, a->size * sizeof(int));
+    }
+    a->array[a->used++] = element;
+}
+
+void freeArray(struct DecimalAdressArray *a) {
+    free(a->array);
+    a->array = NULL;
+    a->used = a->size = 0;
+}
+
+
+void free_entry_list(){
+    while(entry_head != NULL){
+        free(entry_head->symbol_name);
+        free(entry_head);
+        entry_head = entry_head->next;
+    }
+}
+
+void free_extern_list(){
+    while(extern_head != NULL){
+        free(extern_head->symbol_name);
+        freeArray(&extern_head->decimal_adress);
+        free(extern_head);
+        extern_head = extern_head->next;
+    }
 }
