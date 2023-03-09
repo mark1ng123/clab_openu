@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "structures.h"
 
 /*
  * check_is_line_starting_with_symbol method:
@@ -288,5 +289,101 @@ void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line
 
 void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int line);
 
+/*i added this*/
+/*
+ * potential_symbol_to_binary:
+ * inserts a new binary line of code to the missing line from first_parse.
+ * method uses:
+ * potential_symbol_to_binary, check_if_in_symbol_table, write_symbol_binary
+ */
+void potential_symbol_to_binary(char* potential_symbol_name, int line_counter);
+
+/*
+ * check_if_potential_symbol_name:
+ * receives a string pointer to a potential symbol name.
+ * Input:
+ * 1. potential_symbol -> the string pointer.
+ * Output:
+ * 1. return -1 if its not a valid symbol name.
+ * 2. return 0 if its a valid symbol name.
+ */
+int check_if_potential_symbol_name(char *potential_symbol);
+
+/*
+ * check_if_in_symbol_table:
+ * receives a string pointer to a valid symbol name so
+ * we can check if he is in our symbol_table.
+ * Input:
+ * 1. potential_symbol -> the string pointer.
+ * Output:
+ * 1. return -1 if its not a in symbol_table.
+ * 2. return 0 if its a in symbol_table.
+ */
+int check_if_in_symbol_table(char* potential_symbol_name);
+
+/*
+ * write_symbol_binary:
+ * inserts decimal address to binary into the binary list
+ */
+void write_symbol_binary(char* decimal_address);
+
+/*
+ * lean_potential_symbol_to_binray:
+ * delete the Colon from out our symbols
+ */
+void clean_potential_symbol_to_binray();
+
+/*
+ * create_object_file:
+ * creating a file object from the given file name
+ * Input:
+ * 1. file_name -> the file name so we can create the designated file.
+ * Output:
+ * 1. return -1 if there was a problem printing to a file.
+ * 2. return 0 if .ob file was created.
+ */
+int create_object_file(char* file_name);
+
+
+int allocate_memory_for_entry();
+
+int check_entry_in_extern(char *potential_symbol_name);
+
+void insert_new_entry(int line ,char *symbol_name);
+
+void insert_entry(char* symbol_name);
+
+int re_occuring_entry_name(char *potential_symbol_name);
+
+int allocate_memory_for_extern();
+
+void insert_new_extern(int line ,char *symbol_name);
+
+void insert_extern(char* symbol_name);
+
+int check_extern_in_entry(char *potential_symbol_name);
+
+int re_occuring_extern_name(char *potential_symbol_name);
+
+int check_if_in_entry_table(char* potential_symbol_name);
+
+int check_if_in_extern_table(char* potential_symbol_name);
+
+int check_if_extern_using_a_symbol_from_current_file();
+
+void initArray(struct DecimalAdressArray *a, size_t initialSize);
+
+void insertArray(struct DecimalAdressArray *a, int element);
+
+void freeArray(struct DecimalAdressArray *a);
+
+int create_entry_file(char* file_name);
+
+int create_extern_file(char* file_name);
+
+void free_extern_list();
+
+void free_entry_list();
 
 #endif
+

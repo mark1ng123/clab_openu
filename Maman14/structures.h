@@ -24,6 +24,32 @@ struct Symbol{
 };
 
 /*
+ * The Entry structure,
+ * Every time we will encounter an entry instruction we want to save
+ * the symbol name following the instruction.
+ * The decimal adress will be intialized in the second parse after we parsed all the text.
+ */
+struct Entry{
+    char *symbol_name;
+    int decimal_adress;
+    struct Entry *next;
+};
+
+struct DecimalAdressArray{
+    int *array;
+    size_t used;
+    size_t size;
+};
+
+struct Extern{
+    char *symbol_name;
+    struct DecimalAdressArray decimal_adress;
+    struct Extern *next;
+};
+
+
+
+/*
  * The BinaryList structure,
  * Every time we have a valid line we want to encode her to binary machine code, the binary code represent in 14 bits,
  * decimal adress its the decimal adress of the binary line, next is the next binary line.
