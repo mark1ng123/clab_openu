@@ -23,7 +23,7 @@ int number_of_files_given(int number_of_files);
 /*
  * is file valid method:
  * Input:
- * 1. *file -> One of the files the user wants to compile.
+ * 1. *file -> One of the files the user wants to run through the assembler process.
  * Output:
  * 1. return 0 -> if the file was able to open.
  * 2. return -1 -> if the file is not opening.
@@ -33,7 +33,7 @@ int is_file_valid(FILE *file);
 /*
  * is file ending valid method:
  * Input:
- * 1. file_name -> One of the file names the user wants to compile.
+ * 1. *file -> One of the files the user wants to run through the assembler process.
  * Output:
  * 1. return 0 -> if the file has the right .as file ext.
  * 2. return -1 -> if the file has any other file ext.

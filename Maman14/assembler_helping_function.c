@@ -132,7 +132,7 @@ int is_valid_string (char * string, int line) {
 
 
     for (char_string = *temp_string; char_string != '\0'; char_string = *++temp_string) {
-        printf("this is char t: %c\n",char_string);
+        
         /* move if encounter spaces in the beginning */
         if ((char_string == ' ') && (is_first_quote == 0)){
             continue;
@@ -254,7 +254,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             for(; char_num < sizeof (full_operand); char_num++){
                 full_operand[char_num] = '\0';
             }
-            printf("full operand : %s\n", full_operand);
+            
             /* Resetting indexes for next operand*/
             char_num = 0;
             is_symbol = 0;
@@ -276,7 +276,7 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             else{
                 is_open++;
             }
-            printf("full operand : %s\n", full_operand);
+            
             char_num = 0;
             is_char = 0;
             /* One closing one Opening */
@@ -323,7 +323,6 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
             if(is_symbol == 1 && is_imidiate == 1){
                 /* Has to be digit */
                 if(isdigit(current_char)){
-                    printf("Number OK\n");
                     is_digit++;
                 }else{
                     error_def = "Invalid syntax";
@@ -379,7 +378,6 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
                 register_new_error(line_counter, error_def);
                 return -1;
             }
-            printf("char num %d, current char %c \n", char_num, current_char);
         }
     }
     if(is_open != is_close){
@@ -387,7 +385,6 @@ int is_valid_operand_assignment(char *operand_phrase, int line_counter, int op_c
         register_new_error(line_counter, error_def);
         return -1;
     }
-    printf("full operand : %s\n", full_operand);
     return 0;
 }
 
@@ -449,10 +446,8 @@ int is_valid_data_instruct(char * string, int line){
                     register_new_error(line, error_def);
                     return -1;
                 }
-                printf("full number: %s\n", full_number);
                 digits = 0;
             }else if(is_comma == 2 && digits != 0 && is_symbol == 0){
-                printf("full number: %s\n", full_number);
                 digits = 0;
                 is_comma = 0;
                 strcpy(prev_full_number, full_number);
@@ -470,7 +465,6 @@ int is_valid_data_instruct(char * string, int line){
                 is_symbol = 0;
             }
         }
-    printf("full number: %s\n", full_number);
     free(prev_full_number);
     free(full_number);
     return 0;
@@ -537,7 +531,6 @@ void print_symbols(){
     struct Symbol *temp = NULL;
     temp = symbol_head;
     while(symbol_head != NULL){
-        printf("Symbol: %s in adress: %d\n", symbol_head->name, symbol_head->decimal_adress);
         symbol_head = symbol_head->next;
     }
     symbol_head = temp;
@@ -578,12 +571,12 @@ char* int_to_binary(int number, int op_code){
     if(op_code < 15){
         reversed_binary_number = malloc(BINARY_TWOS);
         right = BINARY_TWOS;
-    }else if(op_code == 20){    /* Second parse */
+    }else if(op_code == SYMBOL_TO_BINARY_OP_CODE){    /* Second parse */
         reversed_binary_number = malloc(BINARY_TWOS + 2);
         right = BINARY_TWOS;
         reversed_binary_number[13] = '0';
         reversed_binary_number[12] = '1';
-    }else if(op_code == 21){ /* Second parse entry */
+    }else if(op_code == EXTERN_OP_CODE){ /* Second parse extern */
         reversed_binary_number = malloc(BINARY_TWOS + 2);
         for(;char_iterator < BINARY_TWOS+2; char_iterator++){
             reversed_binary_number[char_iterator] = '0';
@@ -672,7 +665,6 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
     /* Setting the base for input of the two operands */
     char *binary_src_operand_code = malloc(OPERANDS_OFFSET);
     char *binary_dest_operand_code = malloc(OPERANDS_OFFSET);
-    printf("operation code:  %d\n", op_code);
     /* Insert new binary */
     if(allocate_memory_for_binary_code() == 0){
         /* Setting known vars */
@@ -697,16 +689,14 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                 } else if(strchr(operand_phrase, '#')){
                     /* Source */
                     if(number_of_operand == 1){
-                        printf("Helol \n");
+                        
                         number = malloc(strlen(operand_phrase)-1);
                         strcpy(number, operand_phrase+1);
                         ascii_number = string_to_number_conv(number);
                         ascii_in_binary = compliment_two_binary(int_to_binary(ascii_number, op_code), ascii_number);
-                        printf("what is this shit  %s\n", ascii_in_binary);
                         binary_src_operand_code = malloc(BINARY_TWOS+2);/*i added this*/
                         strcpy(binary_src_operand_code, ascii_in_binary);
                         memcpy(current_binary->binary_code+source_operand_start_idx, "00", REGISTER_SORTING);
-                        printf("Current binary hello  %s\n", current_binary->binary_code);
                         src_number++;
                     }else{  /* Dest operand */
                         number = malloc(strlen(operand_phrase)-1);
@@ -736,7 +726,6 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
 
             operand_phrase = strtok(operand_phrase, "(, ");
             while (operand_phrase != NULL) {
-                printf("operand_phrase : %s\n", operand_phrase);
                 number_of_operand++;
                 if (check_if_word_is_register(operand_phrase) != -1) {
                     register_index = check_if_word_is_register(operand_phrase);
@@ -845,11 +834,9 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                         if(binary_src_operand_code == NULL){
                             memcpy(current_binary->binary_code, "??????????????", WORD_SIZE);
                         }else if(src_number == 0 ){
-                            printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                             memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
                         }else{
-                            printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
-                            memcpy(current_binary->binary_code, binary_src_operand_code, BINARY_TWOS);
+	                    memcpy(current_binary->binary_code, binary_src_operand_code, BINARY_TWOS);
                         }
                     }
                     else{
@@ -900,18 +887,14 @@ void binary_encoding(int op_code, int decimal_adress, char* operand_phrase, int 
                                 memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
                             }
                             if(src_number == 0){
-                                printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code+source_operand_solo_line, binary_src_operand_code, OPERANDS_OFFSET);
                             }else{
-                                printf("source:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code, binary_src_operand_code, BINARY_TWOS);
                             }
                         }else if(number_of_operand == 1 && solo_operand == 0){
                             if(dest_number == 0){
-                                printf("dest:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code+dest_operand_solo_line, binary_dest_operand_code, OPERANDS_OFFSET);
                             }else{
-                                printf("dest:%s, index = %d\n", binary_src_operand_code, source_operand_solo_line);
                                 memcpy(current_binary->binary_code, binary_dest_operand_code, BINARY_TWOS);
                             }
                         }else if(solo_operand == 1){
@@ -953,7 +936,6 @@ void print_binary_list(){
     struct BinaryList *temp = NULL;
     temp = binary_head;
     while(binary_head != NULL){
-        printf("Line: %d, Binary code: %s ,in adress: %d\n", binary_head->line,binary_head->binary_code, binary_head->decimal_adress);
         binary_head = binary_head->next;
     }
     binary_head = temp;
@@ -970,7 +952,6 @@ void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line
     int number = 0;
     int op_code = 15;
     char *number_in_binary;
-    printf("operand_phrase debug %s\n", operand_phrase);
     operand_phrase = strtok(operand_phrase, ", \n");
     while(operand_phrase != NULL){
         if(allocate_memory_for_binary_code() == 0){
@@ -979,8 +960,6 @@ void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line
             number = string_to_number_conv(operand_phrase);
             number_in_binary = compliment_two_binary(int_to_binary(number, op_code), number);
             memcpy(current_binary->binary_code, number_in_binary, BINARY_TWOS + 2);
-            printf("current _ binary:  %s\n", current_binary->binary_code);
-            printf("test binary: %s\n", number_in_binary);
         }
         insert_new_binary();
         decimal_adress++;
@@ -1067,11 +1046,11 @@ void potential_symbol_to_binary(char* potential_symbol_name, int line_counter){
     if(check_if_potential_symbol_name(potential_symbol_name) != -1){
         if(is_symbol != 0){
             if(is_entry == 0){
-                    write_symbol_binary(int_to_binary(is_symbol,20));/*need to change 20 to something with meaning*/
+                    write_symbol_binary(int_to_binary(is_symbol,SYMBOL_TO_BINARY_OP_CODE));
                 }else{
                     if(entry_head->decimal_adress == 0){
                         entry_head->decimal_adress = is_symbol;
-                        write_symbol_binary(int_to_binary(is_symbol,20));/*need to change 20 to something with meaning*/
+                        write_symbol_binary(int_to_binary(is_symbol,SYMBOL_TO_BINARY_OP_CODE));
                     }else{
                         error_def = "Entry symbol was found in more then one place";
                         register_new_error(line_counter, error_def);
@@ -1079,15 +1058,13 @@ void potential_symbol_to_binary(char* potential_symbol_name, int line_counter){
                 }
             }else if(is_extern != 0){
                 if(extern_head->decimal_adress.array == NULL){
-                    printf("intialize array: %s\n", extern_head->symbol_name);
                     initArray(&extern_head->decimal_adress, 1);
                 }
                 while(binary_head != NULL){
                     if(strcmp(binary_head->binary_code, "??????????????") == 0){
-                        printf("insert to array: %s, %d\n", extern_head->symbol_name, binary_head->decimal_adress);
                         insertArray(&extern_head->decimal_adress, binary_head->decimal_adress);
                         binary_head = list_temp;
-                        write_symbol_binary(int_to_binary(is_symbol,21));
+                        write_symbol_binary(int_to_binary(is_symbol,EXTERN_OP_CODE));
                         break;
                     }
                     binary_head = binary_head->next;
@@ -1219,7 +1196,6 @@ int re_occuring_entry_name(char *potential_symbol_name){
     struct Entry *it = NULL;
     it = entry_head;
     while(entry_head != NULL){
-        printf("CHECKING CHECKING %s\n",entry_head->symbol_name );
         if(strcmp(entry_head->symbol_name, potential_symbol_name) == 0){
             entry_head = it;
             return 1;
@@ -1234,7 +1210,6 @@ int check_entry_in_extern(char *potential_symbol_name){
     struct Extern *it = NULL;
     it = extern_head;
     while(extern_head != NULL){
-        printf("Checking checking checking  : %s \n", extern_head->symbol_name);
         if(strcmp(extern_head->symbol_name, potential_symbol_name) == 0){
             extern_head = it;
             extern_head = it;
@@ -1305,7 +1280,6 @@ int check_extern_in_entry(char *potential_symbol_name){
     struct Entry *it = NULL;
     it = entry_head;
     while(entry_head != NULL){
-        printf("Checking checking checking  : %s \n", entry_head->symbol_name);
         if(strcmp(entry_head->symbol_name, potential_symbol_name) == 0){
             entry_head = it;
             return 1;
@@ -1447,4 +1421,18 @@ void free_extern_list(){
         free(extern_head);
         extern_head = extern_head->next;
     }
+}
+
+int check_if_extern_list_is_empty(){
+    if(extern_head == NULL){
+        return 1;
+    }
+    return 0;
+}
+
+int check_if_entry_list_is_empty(){
+    if(entry_head == NULL){
+        return 1;
+    }
+    return 0;
 }

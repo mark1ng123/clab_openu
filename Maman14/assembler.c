@@ -1,15 +1,13 @@
-/* TODO: Add doc when finished each step.*/
 /*
  * Assembler Program file:
  * The program will take a code written in assembly and convert it to machine language code,
  * The program will receive through the command line the file or files the program the user wants to convert,
  * The program will work in a 3-step plan:
  * 1. Pre-assembler -> Main job is expanding macros (more doc written in the pre-assembler program files)
- * 2.
- * 3.
- * And when its finished we will receive a machine language code file ending with obj ext.
+ * 2. First-parse -> Parsing the .am file which the pre-assembler outputs.
+ * 3. Second-parse -> Parsing the .am file for the second time mainly for symbol binaries.
+ * And when its finished we will receive a machine language code file ending with obj extension.
  */
-
 #include <stdio.h>
 #include "check_input_files.h"
 #include "pre_assembler.h"
@@ -42,7 +40,7 @@ int main(int argc, char **argv){
 
         /* checking for valid .as file extension */
         if(is_file_ending_valid(file_name) == -1){
-            printf("Please enter a file ending with .as\n");
+            printf("%s is not ending with .as extension \n", file_name);
             return -1;
         }
 
@@ -52,24 +50,32 @@ int main(int argc, char **argv){
             printf("Had a problem opening one of the given files\n");
             return -1;
         }
+
+
         /* step one: pre-assembler stage: */
-        printf("Opened the file successfully, continuing to the pre-assembler stage\n\n\n");
         if(pre_assemble(current_file, file_name)==-1){
             return -1;
         }
 
-        if(first_parse(file_name) != 1){
+        /*step two: first_parse stage: */
+
+        if(first_parse(file_name) != 1){\
+            /*step three: second_parse stage: */
             if(second_parse(file_name) != 1){
+                /* If both stages finished correctly we create the output files */
                 if(create_object_file(file_name) == -1){
                     return -1;
                 }
-                if(create_entry_file(file_name) == -1){
-                    return -1;
+                if(check_if_entry_list_is_empty() == 0){
+                    if(create_entry_file(file_name) == -1){
+                        return -1;
+                    }
                 }
-                if(create_extern_file(file_name) == -1){
-                    return -1;
+                if(check_if_extern_list_is_empty() == 0){
+                    if(create_extern_file(file_name) == -1){
+                        return -1;
+                    }
                 }
-                printf("--------------------------FINISHED--------------------------\n");
                 free_symbols();
                 free_binary_list();
                 free_entry_list();
