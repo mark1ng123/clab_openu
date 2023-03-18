@@ -12,9 +12,7 @@ int number_of_files_given(int number_of_files){
     if(number_of_files == 0){
         return -1;
     }
-    else{
-        return 0;
-    }
+    return 0;
 }
 
 int is_file_ending_valid(char *file_name){
@@ -29,6 +27,5 @@ int is_file_valid(FILE *file){
     if(file == NULL){
         return -1;
     }
-
     return 0;
 }

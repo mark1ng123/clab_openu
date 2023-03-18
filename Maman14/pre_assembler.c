@@ -47,7 +47,7 @@ int pre_assemble(FILE *as_input_file, char* file_name) {
             macro_code = NULL;
             continue;
         }
-        /* Second expression if we found a macro ending */
+            /* Second expression if we found a macro ending */
         else if (strstr(reading_line, "endmcr") != NULL && is_read_mcr != 0) {
             is_read_end_mcr ++;
             macro = malloc(sizeof(struct Macro)); /* Allocating memory for the Macro structure */
@@ -74,7 +74,7 @@ int pre_assemble(FILE *as_input_file, char* file_name) {
             }
             is_read_mcr = 0;
         }
-        /* Third expression if we opened a macro with the opening mcr flag write everything into the macro */
+            /* Third expression if we opened a macro with the opening mcr flag write everything into the macro */
         else if(is_read_mcr != 0){
             if (macro_code == NULL) {
                 macro_code = malloc(strlen(reading_line) + 1);
@@ -125,7 +125,7 @@ int pre_assemble(FILE *as_input_file, char* file_name) {
         if(mcr_counter > 0){
             continue;
         }
-        /* Simple line write it */
+            /* Simple line write it */
         else if (!(found_macro) && strstr(line,"mcr") == NULL) {
             fputs(line, am_output_file);
             mcr_counter=0;
@@ -135,6 +135,7 @@ int pre_assemble(FILE *as_input_file, char* file_name) {
     /* file closing */
     fclose(as_input_file);
     fclose(am_output_file);
+
 
     /* Memory free */
     it = head;
@@ -147,4 +148,3 @@ int pre_assemble(FILE *as_input_file, char* file_name) {
     }
     return 0;
 }
-

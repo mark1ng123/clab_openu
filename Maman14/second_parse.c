@@ -47,7 +47,6 @@ int second_parse(char* file_name) {
 
     /* Main reading loop, iterating over the file line by line */
     while (fgets(reading_line, MAX_LINE_LENGTH, am_file) != NULL) {
-        printf("Hello %s\n", reading_line);
         line_counter++;
         potential_symbol_name = malloc(MAX_SYMBOL_LENGTH);
         if(potential_symbol_name == NULL){

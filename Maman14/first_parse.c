@@ -60,9 +60,7 @@ int first_parse(char* file_name) {
 
         /* Reading in from the line*/
         sscanf(reading_line, " %s ", potential_symbol_name);
-        printf("potential_symbol: %s\n ", potential_symbol_name);
 
-        /*~~~~~~~~~~~~~~~ do we  count the line?, probably no ~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         if(is_skip_line(potential_symbol_name) == 0){
             continue; /* do we */
         }
@@ -71,7 +69,6 @@ int first_parse(char* file_name) {
             if(check_valid_symbol_name(potential_symbol_name, line_counter) == 0){
                 /* Allocating memory for symbol struct */
                 if(allocate_memory_for_symbol()== 0){
-                    printf("decimal adress: %d for symbol: %s\n", decimal_adress, potential_symbol_name);
 
                     /* Assigning the symbol his decimal address: */
                     append_decimal_adress_to_symbol(decimal_adress);
@@ -85,7 +82,6 @@ int first_parse(char* file_name) {
                     /* Everything after the colon */
                     rest_of_the_line = strchr(reading_line, ':');
                     rest_of_the_line++;
-                    printf("symbol name: %s , rest:%s\n", potential_symbol_name, rest_of_the_line);
 
                     /* Parsing word by word and checking what are the next instructions given in our assembly program: */
                     word_parse = strtok(rest_of_the_line, " \n");
@@ -104,14 +100,11 @@ int first_parse(char* file_name) {
                                 case 2:
                                 case 3:
                                 case 6:
-                                    printf("operation: %s\n", word_parse);
                                     word_counter++;
                                     word_parse = strtok(NULL, "\n");
                                     operand_phrase = malloc(sizeof(word_parse));
                                     strcpy(operand_phrase, word_parse);
-                                    printf("operand_phrase: %s\n", word_parse);
                                     if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                        printf("OK\n");
                                         word_parse = strtok(word_parse, "\n, ");
                                         while(word_parse!=NULL){
                                             if(check_if_word_is_register(word_parse) != -1){
@@ -120,7 +113,6 @@ int first_parse(char* file_name) {
                                             else {
                                                 word_counter++;
                                             }
-                                        printf("\n word_parse is: %s \n" , word_parse);
                                         word_parse = strtok(NULL, "\n, ");
                                     }
                                     if(word_is_register + word_counter != 3){
@@ -147,23 +139,18 @@ int first_parse(char* file_name) {
                                 case 8:
                                 case 11:
                                 case 12:
-                                    printf("operation: %s\n", word_parse);
                                     word_counter++;
                                     word_parse = strtok(NULL, "\n");
                                     operand_phrase = malloc(sizeof(word_parse));
                                     strcpy(operand_phrase, word_parse);
-                                    printf("operand_phrase: %s\n", word_parse);
                                     if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                        printf("OK\n");
                                         word_parse = strtok(word_parse, "\n, ");
-                                        printf("check %s\n", word_parse);
                                         if(check_if_word_is_register(word_parse) != -1){
                                             word_is_register++;
                                         }
                                         else {
                                             word_counter++;
                                         }
-                                        printf("\n word_parse is: %s \n" , word_parse);
                                         strtok(NULL, "\n, ");
                                         if(word_is_register + word_counter != 2){
                                             error_def = "Invalid number of params";
@@ -186,14 +173,11 @@ int first_parse(char* file_name) {
                                 case 9:
                                 case 10:
                                 case 13:
-                                    printf("operation: %s\n", word_parse);
                                     word_counter++;
                                     word_parse = strtok(NULL, "\n");
                                     operand_phrase = malloc(sizeof(word_parse));
                                     strcpy(operand_phrase, word_parse);
-                                    printf("phrase: %s\n", word_parse);
                                     if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                        printf("OK\n");
                                         word_parse = strtok(word_parse, "(, ");
                                         while(word_parse != NULL){
                                             if(word_counter == 1 && check_if_word_is_register(word_parse) != -1){
@@ -243,33 +227,25 @@ int first_parse(char* file_name) {
                             switch(data_instruction_code){
                                 /* .data */
                                 case 0:
-                                    printf("data_instraction: %s\n", word_parse);
                                     word_parse = strtok(NULL, "\n");
                                     operand_phrase = malloc(sizeof(word_parse));
                                     strcpy(operand_phrase, word_parse);
-                                    printf("current_word: %s\n", word_parse);
                                     if(is_valid_data_instruct(word_parse, line_counter) == 0){
                                         word_parse = strtok(word_parse, ", \n");
-                                        printf("operand_phrase: %s\n", word_parse);
                                         while(word_parse != NULL){
-                                            printf("Word: %s\n", word_parse);
-                                            printf("ascii: %d\n", (string_to_number_conv(word_parse)));
                                             word_parse = strtok(NULL, ", \n");
                                             word_counter ++;
                                         }
                                     }
-                                    printf("test\n");
                                     binary_encoding_for_data(decimal_adress, operand_phrase, line_counter);
                                     decimal_adress += word_counter;
                                     word_counter = 0;
                                     break;
                                 /* .string */
                                 case 1:
-                                    printf("data_instraction: %s\n", word_parse);
                                     word_parse = strtok(NULL, "\n");
                                     operand_phrase = malloc(sizeof(word_parse));
                                     strcpy(operand_phrase, word_parse);
-                                    printf("current_word: %s\n", word_parse);
                                     if(is_valid_string(word_parse, line_counter) == 0){
                                         temp_string = malloc(strlen(word_parse)+1);
                                         strcpy(temp_string,word_parse);
@@ -281,11 +257,9 @@ int first_parse(char* file_name) {
                                                 continue;
                                             }
                                             else {
-                                                printf("%d\n",calc_ascii_in_string(char_string));
                                                 word_counter++;
                                             }
                                         }
-                                        printf("%d\n",'\0');
                                         word_counter ++; /*need to add null pointer*/
 
                                     }
@@ -318,7 +292,6 @@ int first_parse(char* file_name) {
         }/* Not starting with symbol, same methodology, just working on incrementing the decimal address on lines
         without symbols */
         else{
-            printf("line:%s \n", reading_line);
             word_parse = strtok(reading_line, " \n");
             while(word_parse!=NULL){
                 data_instruction_code = check_if_word_is_data_instruction(word_parse);
@@ -333,14 +306,11 @@ int first_parse(char* file_name) {
                             case 2:
                             case 3:
                             case 6:
-                                printf("operation: %s\n", word_parse);
                                 word_counter++;
                                 word_parse = strtok(NULL, "\n");
                                 operand_phrase = malloc(sizeof(word_parse));
                                 strcpy(operand_phrase, word_parse);
-                                printf("operand_phrase: %s\n", word_parse);
                                 if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                    printf("OK\n");
                                     word_parse = strtok(word_parse, "\n, ");
                                     while(word_parse!=NULL){
                                     if(check_if_word_is_register(word_parse) != -1){
@@ -349,7 +319,6 @@ int first_parse(char* file_name) {
                                     else {
                                         word_counter++;
                                     }
-                                    printf("\n word_parse is: %s \n" , word_parse);
                                     word_parse = strtok(NULL, "\n, ");
                                 }
                                 if(word_is_register + word_counter != 3){
@@ -376,23 +345,18 @@ int first_parse(char* file_name) {
                             case 8:
                             case 11:
                             case 12:
-                                printf("operation: %s\n", word_parse);
                                 word_counter++;
                                 word_parse = strtok(NULL, "\n");
                                 operand_phrase = malloc(sizeof(word_parse));
                                 strcpy(operand_phrase, word_parse);
-                                printf("operand_phrase: %s\n", word_parse);
                                 if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                    printf("OK\n");
                                     word_parse = strtok(word_parse, "\n, ");
-                                    printf("check %s\n", word_parse);
                                     if(check_if_word_is_register(word_parse) != -1){
                                         word_is_register++;
                                     }
                                     else {
                                         word_counter++;
                                     }
-                                    printf("\n word_parse is: %s \n" , word_parse);
                                     strtok(NULL, "\n, ");
                                     if(word_is_register + word_counter != 2){
                                         error_def = "Invalid number of params";
@@ -415,14 +379,11 @@ int first_parse(char* file_name) {
                         case 9:
                         case 10:
                         case 13:
-                            printf("operation: %s\n", word_parse);
                             word_counter++;
                             word_parse = strtok(NULL, "\n");
                             operand_phrase = malloc(sizeof(word_parse));
                             strcpy(operand_phrase, word_parse);
-                            printf("operand_phrase: %s\n", word_parse);
                             if(is_valid_operand_assignment(word_parse, line_counter, op_code) == 0){
-                                printf("OK\n");
                                 word_parse = strtok(word_parse, "(, ");
                                 while(word_parse != NULL){
                                     if(word_counter == 1 && check_if_word_is_register(word_parse) != -1){
@@ -469,31 +430,23 @@ int first_parse(char* file_name) {
                     switch(data_instruction_code){
                         /* .data */
                         case 0:
-                            printf("data_instraction: %s\n", word_parse);
                             word_parse = strtok(NULL, "\n");
-                            printf("current_word: %s\n", word_parse);
                             if(is_valid_data_instruct(word_parse, line_counter) == 0){
                                 word_parse = strtok(word_parse, ", \n");
                                 operand_phrase = malloc(sizeof(word_parse));
                                 strcpy(operand_phrase, word_parse);
-                                printf("operand_phrase: %s\n", word_parse);
                                 while(word_parse != NULL){
-                                    printf("Word: %s\n", word_parse);
-                                    printf("ascii: %d\n", (string_to_number_conv(word_parse)));
                                     word_parse = strtok(NULL, ", \n");
                                     word_counter ++;
                                 }
-                            }
-                            printf("test\n");
+                            };
                             binary_encoding_for_data(decimal_adress, operand_phrase, line_counter);
                             decimal_adress += word_counter;
                             word_counter = 0;
                             break;
                         /* .string */
                         case 1:
-                            printf("data_instraction: %s\n", word_parse);
                             word_parse = strtok(NULL, "\n");
-                            printf("current_word: %s\n", word_parse);
 
                             if(is_valid_string(word_parse, line_counter) == 0){
                                 temp_string = malloc(strlen(word_parse)+1);
@@ -506,11 +459,9 @@ int first_parse(char* file_name) {
                                         continue;
                                     }
                                     else {
-                                        printf("%d\n",calc_ascii_in_string(char_string));
                                         word_counter++;
                                     }
                                 }
-                                printf("%d\n",'\0');
                                 word_counter ++; /*need to add null pointer*/
 
                             }
@@ -523,7 +474,6 @@ int first_parse(char* file_name) {
                     DC++;
                 }
                 else if(check_if_word_entry_extern_instruction(word_parse)!=-1){
-                    printf("ext_or_ent: %s\n", word_parse);
                     entry_or_extern = check_if_word_entry_extern_instruction(word_parse);
                     switch(entry_or_extern){
                         /* extern */
@@ -564,7 +514,6 @@ int first_parse(char* file_name) {
             word_is_register = 0;
             word_counter = 0;
         }
-        printf("decimal adress : %d\n", decimal_adress);
         rest_of_the_line = NULL;
         word_parse = NULL;
         line_counter++;
@@ -584,7 +533,8 @@ int first_parse(char* file_name) {
     }
     print_symbols();
     print_binary_list();
-    printf("IC: %d, DC: %d\n", IC, DC);
     fclose(am_file);
     return is_error;
 }
+
+

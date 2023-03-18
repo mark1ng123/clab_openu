@@ -35,12 +35,23 @@ struct Entry{
     struct Entry *next;
 };
 
+/*
+ * The DecimalAdressArray structure,
+ * Every time we will encounter extern instruction we want to save all the occurrences of the extern symbol.
+ * this structure of an array will allow us to use an integer array dynamically.
+ */
 struct DecimalAdressArray{
     int *array;
     size_t used;
     size_t size;
 };
 
+/*
+ * The extern structure,
+ * Every time we will encounter an extern instruction we want to save
+ * the symbol name following the instruction.
+ * the DecimalAdressArray will save us all the occurrences of the extern instruction.
+ */
 struct Extern{
     char *symbol_name;
     struct DecimalAdressArray decimal_adress;

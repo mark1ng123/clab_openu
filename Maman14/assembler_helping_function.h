@@ -13,6 +13,8 @@
 #define REGISTER_SORTING 2
 #define OPERANDS_OFFSET 6
 #define BINARY_TWOS 12
+#define SYMBOL_TO_BINARY_OP_CODE 20
+#define EXTERN_OP_CODE 21
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -289,7 +291,6 @@ void binary_encoding_for_data(int decimal_adress, char *operand_phrase, int line
 
 void binary_encoding_for_string(int decimal_adress, char *operand_phrase, int line);
 
-/*i added this*/
 /*
  * potential_symbol_to_binary:
  * inserts a new binary line of code to the missing line from first_parse.
@@ -316,8 +317,8 @@ int check_if_potential_symbol_name(char *potential_symbol);
  * Input:
  * 1. potential_symbol -> the string pointer.
  * Output:
- * 1. return -1 if its not a in symbol_table.
- * 2. return 0 if its a in symbol_table.
+ * 1. return int decimal number if its in symbol_table.
+ * 2. return 0 if its not a in symbol_table.
  */
 int check_if_in_symbol_table(char* potential_symbol_name);
 
@@ -328,7 +329,7 @@ int check_if_in_symbol_table(char* potential_symbol_name);
 void write_symbol_binary(char* decimal_address);
 
 /*
- * lean_potential_symbol_to_binray:
+ * clean_potential_symbol_to_binray:
  * delete the Colon from out our symbols
  */
 void clean_potential_symbol_to_binray();
@@ -345,45 +346,210 @@ void clean_potential_symbol_to_binray();
 int create_object_file(char* file_name);
 
 
+/*
+ * allocate_memory_for_entry:
+ * allocating memory for entry op_code
+ * Output:
+ * 1. return -1 Unable allocate memory.
+ * 2. return 0 memory allocation succeeded.
+ */
 int allocate_memory_for_entry();
 
-int check_entry_in_extern(char *potential_symbol_name);
-
-void insert_new_entry(int line ,char *symbol_name);
-
-void insert_entry(char* symbol_name);
-
-int re_occuring_entry_name(char *potential_symbol_name);
-
+/*
+ * allocate_memory_for_extern:
+ * allocating memory for extern op_code
+ * Output:
+ * 1. return -1 Unable allocate memory.
+ * 2. return 0 memory allocation succeeded.
+ */
 int allocate_memory_for_extern();
 
-void insert_new_extern(int line ,char *symbol_name);
+/*
+ * check_entry_in_extern:
+ * searching in extren table if there is the same symbol name as entry.
+ * Input:
+ * 1. potential_symbol -> the string pointer. 
+ * Output:
+ * 1. return 1 entry symbol is in extern table.
+ * 2. return 0 entry symbol isnt in extern table.
+ */
+int check_entry_in_extern(char *potential_symbol_name);
 
-void insert_extern(char* symbol_name);
-
+/*
+ * check_extern_in_entry:
+ * searching in entry table if there is the same symbol name as extren.
+ * Input:
+ * 1. potential_symbol -> the string pointer. 
+ * Output:
+ * 1. return 1 entry symbol is in entry table.
+ * 2. return 0 entry symbol isnt in entry table.
+ */
 int check_extern_in_entry(char *potential_symbol_name);
 
+/*
+ * insert_new_entry:
+ * cheking if entry symbol name already in the table if not insert
+ * Input:
+ * 1. line -> the number of the line. 
+ * 2. symbol_name -> the string pointer. 
+ */
+void insert_new_entry(int line ,char *symbol_name);
+
+/*
+ * insert_entry:
+ * allocating and inserting the entry symbol.
+ * Input: 
+ * 1. symbol_name -> the string pointer. 
+ */
+void insert_entry(char* symbol_name);
+
+/*
+ * insert_new_extern:
+ * cheking if extern symbol name already in the table if not insert
+ * Input:
+ * 1. line -> the number of the line. 
+ * 2. symbol_name -> the string pointer. 
+ */
+void insert_new_extern(int line ,char *symbol_name);
+
+/*
+ * insert_extern:
+ * allocating and inserting the extern symbol.
+ * Input: 
+ * 1. symbol_name -> the string pointer. 
+ */
+void insert_extern(char* symbol_name);
+
+/*
+ * re_occuring_entry_name:
+ * cheking if symbol entry name was already in the entry table
+ * Input:
+ * 1. potential_symbol -> the string pointer. 
+ * Output:
+ * 1. return 1 new entry symbol already in the entry table.
+ * 2. return 0 new entry symbol isnt in entry table.
+ */
+int re_occuring_entry_name(char *potential_symbol_name);
+
+/*
+ * re_occuring_extren_name:
+ * cheking if symbol entry name was already in the extern table
+ * Input:
+ * 1. potential_symbol -> the string pointer. 
+ * Output:
+ * 1. return 1 new extern symbol already in the table.
+ * 2. return 0 new extern symbol isnt in externtable.
+ */
 int re_occuring_extern_name(char *potential_symbol_name);
 
+
+/*
+ * check_if_in_entry_table:
+ * searching in entry table if there is the same symbol name as extren.
+ * Input:
+ * 1. potential_symbol -> the string pointer. 
+ * Output:
+ * 1. return 1 entry symbol is in entry table.
+ * 2. return 0 entry symbol isnt in entry table.
+ */
 int check_if_in_entry_table(char* potential_symbol_name);
 
+/*
+ * check_if_in_extern_table:
+ * searching in entry table if there is the same symbol name as extren.
+ * Input:
+ * 1. potential_symbol -> the string pointer. 
+ * Output:
+ * 1. return 1 entry symbol is in entry table.
+ * 2. return 0 entry symbol isnt in entry table.
+ */
 int check_if_in_extern_table(char* potential_symbol_name);
 
+/*
+ * check_if_extern_using_a_symbol_from_current_file:
+ * searching if extren symbol name is in symbol table
+ * Output:
+ * 1. return -1 extern using symbol name that in symbol table.
+ * 2. return 0 entry symbol isnt in entry table.
+ */
 int check_if_extern_using_a_symbol_from_current_file();
 
+/*
+ * initArray:
+ * allocating memory for struct DecimalAdressArray
+ * Input:
+ * 1. a -> struct of extern symbol name adresses. 
+ * 2. initialSize -> size of the array.
+ */
 void initArray(struct DecimalAdressArray *a, size_t initialSize);
 
+/*
+ * insertArray:
+ * inserting and re-allocating memory for struct DecimalAdressArray
+ * Input:
+ * 1. a -> struct of extern symbol name adresses. 
+ * 2. element -> new adress to add.
+ */
 void insertArray(struct DecimalAdressArray *a, int element);
 
+/*
+ * freeArray:
+ * free memory for struct DecimalAdressArray
+ * Input:
+ * 1. a -> struct of extern symbol name adresses.  
+ */
 void freeArray(struct DecimalAdressArray *a);
 
+/*
+ * create_entry_file:
+ * checking if there is not an empty entry table and creating a file and printing the table .
+ * Input:
+ * 1. file_name -> given file name to create entry file for him. 
+ * Output:
+ * 1. return -1 there was a problem allocating memory for entry file.
+ * 2. return 0 entry file was created.
+ */
 int create_entry_file(char* file_name);
 
+/*
+ * create_extern_file:
+ * checking if there is not an empty extern table and creating a file and printing the table .
+ * Input:
+ * 1. file_name -> given file name to create extern file for him. 
+ * Output:
+ * 1. return -1 there was a problem allocating memory for extern file.
+ * 2. return 0 entry file was created.
+ */
 int create_extern_file(char* file_name);
 
+/*
+ * free_extern_list:
+ * free memory for extern symbol table.
+ */
 void free_extern_list();
 
+/*
+ * free_entry_list:
+ * free memory for extern symbol table.
+ */
 void free_entry_list();
+
+/*
+ * check_if_extern_list_is_empty method:
+ * will check if the extern list is empty for the extern file creation,
+ * if list is empty return 1 and a file does not need to be created,
+ * otherwise return 0 and create extern file.
+ */
+int check_if_extern_list_is_empty();
+
+
+/*
+ * check_if_entry_list_is_empty method:
+ * will check if the entry list is empty for the entry file creation,
+ * if list is empty return 1 and a file does not need to be created,
+ * otherwise return 0 and create extern file.
+ */
+int check_if_entry_list_is_empty();
 
 #endif
 

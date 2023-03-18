@@ -22,11 +22,11 @@
  * Every time a macro will be saved, it will have a name, a text/code written between the opening flag
  * and the closing flag and the next macro in line.
  */
-struct Macro{
+typedef struct Macro{
     char *name;
     char *code;
     struct Macro *next;
-};
+}Macro;
 
 /*
  * The pre-assemble method,
